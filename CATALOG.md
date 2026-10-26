@@ -14,5 +14,10 @@
 | 2026-10-25 | 90 min | Lullabies for Babies – sleeping elephant under the stars (mama opens eye, owls, bunnies, sheep) | EN | ep/sensory.js |
 | 2026-10-26 | 90 min | Under the Sea – calm ocean animals (whale, dolphins, shark, manta, turtle, jellyfish, seahorse, clownfish, octopus, crab) | EN | ep/ocean.js |
 
+## Shorts (English)
+| Date made | Title | Source | Scheduled |
+|---|---|---|---|
+| 2026-10-26 | Under the Sea – Who swims by? | ep/ocean.js T0=20, 40 s | 2026-10-27 17:00 |
+
 ## Theme ideas not used yet
 rain forest at dusk, snowy forest / arctic (polar bears, penguins, seals), night farm, space & planets with friendly astronaut animals, autumn forest (fox, hedgehog, squirrel), savanna sunset (Big Four sleeping), rainy window & cozy room, hot-air balloons over hills, aquarium/koi pond, butterflies & flower garden, bedtime train journey with Toet (night countryside).
