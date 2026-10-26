@@ -20,10 +20,8 @@ Owner: Hans (speaks Dutch – talk to him in Dutch). Channel: https://www.youtub
 - Shorts: vertical 1080x1920, ≤ 60 s, tools/shorts.py shows the approach.
 - Always look at stills/contact sheets of what you render before delivering (check overlaps, seams, fades).
 
-## Weekly batch (scheduled task)
-1. Read CATALOG.md, pick a NEW theme not used before.
-2. Make 1 new long calm video (90 min) with new scene + new music, plus English thumbnail.
-3. Make 3 vertical Shorts (≤ 60 s) from new material (e.g. close-ups of the new scene, or a short new Toet/Big Four moment in English).
-4. Write English title, description, tags for each, and the playlist it belongs in.
-5. Commit code + CATALOG.md (no media) and push to main.
-6. Send Hans the files and texts, with a short Dutch summary.
+## Daily batch (scheduled task, every day 07:31 Europe/Amsterdam)
+- Mon + Thu: 1 new 90-min calm video (new theme) + thumbnail.
+- Tue, Wed, Fri, Sat: 1 new English story episode (2–3 min) with Little Truck Toet or The Big Four + thumbnail.
+- Every day: 2 new vertical Shorts (≤ 60 s).
+- Always: quality check, English texts, update CATALOG.md, commit + push code, send files + Dutch summary to Hans. Hans approves and uploads.
