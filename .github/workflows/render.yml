@@ -1,0 +1,38 @@
+name: Render videos
+on:
+  push:
+    branches: [main]
+    paths: ['jobs/*.sh']
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Job name (file in jobs/ without .sh)'
+        required: true
+permissions:
+  contents: write
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 2 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          pip install --quiet numpy scipy pillow
+          npm install --no-audit --no-fund
+      - name: Render and publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -n "${{ github.event.inputs.job }}" ]; then JOBS="jobs/${{ github.event.inputs.job }}.sh";
+          else JOBS=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD -- 'jobs/*.sh'); fi
+          for j in $JOBS; do
+            S=$(basename $j .sh); echo "== $S"
+            bash $j
+            gh release delete "$S" -y --cleanup-tag 2>/dev/null || true
+            gh release create "$S" release/$S/* --title "$S" --notes "Rendered by GitHub Actions"
+          done
