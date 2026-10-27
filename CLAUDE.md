@@ -33,3 +33,4 @@ Owner: Hans (speaks Dutch – talk to him in Dutch). Channel: https://www.youtub
 - Tue, Wed, Fri, Sat: 1 new English story episode (2–3 min) with Little Truck Toet or The Big Four + thumbnail.
 - Every day: 2 new vertical Shorts (≤ 60 s) via tools/short.py.
 - Always: quality check, English texts, render via Actions, schedule via Metricool for the next day, update CATALOG.md, commit + push, send Hans a short Dutch summary of what is scheduled when (with planner links).
+- ffmpeg on the GitHub runner is strict: write decimals with a leading zero in filters (`d=0.6`, never `d=.6`), otherwise it exits with code 234.
