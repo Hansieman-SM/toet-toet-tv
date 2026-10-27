@@ -18,9 +18,12 @@
 ## Shorts (English)
 | Date made | Title | Source | Scheduled |
 |---|---|---|---|
-| 2026-10-26 | Under the Sea – Who swims by? | ep/ocean.js T0=20, 40 s | 2026-10-27 17:00 |
+| 2026-10-26 | Under the Sea – Who swims by? | ep/ocean.js T0=20, 40 s | YT 2026-10-27 17:00 · TikTok 2026-10-28 19:30 |
 | 2026-10-27 | Shape Hunt! – Circle or triangle? | ep/en01_shapes.js 20.5–77.5 s | 2026-10-28 12:00 |
 | 2026-10-27 | Sleepy Elephant – calm lullaby | ep/sensory.js 0–45 s + bw_long_music | 2026-10-28 17:00 |
 
 ## Theme ideas not used yet
 rain forest at dusk, snowy forest / arctic (polar bears, penguins, seals), night farm, space & planets with friendly astronaut animals, autumn forest (fox, hedgehog, squirrel), savanna sunset (Big Four sleeping), rainy window & cozy room, hot-air balloons over hills, aquarium/koi pond, butterflies & flower garden, bedtime train journey with Toet (night countryside).
+
+## TikTok (@toet.friends)
+- 2026-10-28 12:30 Shape Hunt · 17:30 Sleepy Elephant · 19:30 Under the Sea

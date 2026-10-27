@@ -26,7 +26,8 @@ Owner: Hans (speaks Dutch – talk to him in Dutch). Channel: https://www.youtub
 3. Wait for the Actions run (`gh api repos/Hansieman-SM/toet-toet-tv/actions/runs`), check it succeeded, download the result and check frames.
 4. Schedule with Metricool createScheduledPost: providers youtube; youtubeData {title, type "short"|"video", privacy public, tags, category FILM_ANIMATION, madeForKids true, isAiGeneratedContent false}; media = release URL; videoThumbnailUrl = thumbnail release URL for long videos/episodes (the channel is phone-verified, so custom thumbnails should work; if Metricool still rejects the thumbnail, schedule without it and tell Hans to set it in YouTube Studio).
 5. Times (Europe/Amsterdam), next day: Shorts 12:00 and 17:00, episodes 16:00, long calm videos 18:30. Never two posts at the same time; check getScheduledPosts first so nothing is scheduled twice.
-6. Add every item to CATALOG.md (date, title, Metricool post time).
+6. **TikTok** (account @toet.friends, connected in Metricool since 2026-10-27): schedule EVERY vertical Short also on TikTok as a separate Metricool post (providers [{"network":"tiktok"}]), 30 minutes after its YouTube time (12:30 and 17:30). tiktokData: {privacyOption "PUBLIC_TO_EVERYONE", title (short), isAigc false, autoAddMusic false, comments/duet/stitch allowed}. Caption: 1–2 English sentences aimed at parents + "All music and animation is original." + 5–6 hashtags (e.g. #toddlerlearning #kidscartoon #babysensory #toddlermom #preschool + a topic tag). No long videos or 16:9 episodes on TikTok.
+7. Add every item to CATALOG.md (date, title, Metricool post times for YouTube and TikTok).
 
 ## Daily batch (scheduled task, every day 07:31 Europe/Amsterdam)
 - Mon + Thu: 1 new 90-min calm video (new theme) + thumbnail.
