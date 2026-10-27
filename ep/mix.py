@@ -7,6 +7,7 @@ info = json.loads(subprocess.run(['node', sys.argv[1]], capture_output=True, tex
 dur = info['dur']; m = info['music'] or {}
 kind = m.get('kind', 'toet')
 if kind == 'toet': music = toet_long(dur, m.get('shift', 0), m.get('soft', False))
+elif kind == 'shapes': music = shapes_long(dur, m.get('shift', 0))
 elif kind == 'safari': music = safari_long(dur, m.get('shift', 0))
 else: music = lullaby(dur)
 events = [(t, make(name), g, pan) for t, name, g, pan in info['events']]

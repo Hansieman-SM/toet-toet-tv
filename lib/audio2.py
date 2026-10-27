@@ -88,6 +88,52 @@ def safari_long(dur, shift=0):
                 pos += ln
     return tr.buf
 
+# 3/4 "shape hunt" waltz in G: ukulele strums, bouncy bass, whistle-like lead (episode en01)
+SH_A = [[('D5',2),('G5',2),('B5',2)], [('A5',3),('G5',1),('E5',2)], [('D5',2),('E5',2),('G5',2)], [('A5',6)],
+        [('B5',2),('A5',2),('G5',2)], [('E5',2),('G5',2),('A5',2)], [('F#5',2),('E5',2),('D5',2)], [('G5',4),('-',2)]]
+SH_ACH = ['G','C','G','D','Em','C','D','G']
+SH_B = [[('E5',1),('F#5',1),('G5',2),('E5',2)], [('C5',2),('E5',2),('G5',2)], [('B4',1),('C5',1),('D5',2),('G5',2)], [('B5',4),('A5',2)],
+        [('C6',2),('B5',2),('A5',2)], [('G5',2),('E5',2),('C5',2)], [('D5',2),('A5',2),('F#5',2)], [('G5',6)]]
+SH_BCH = ['Em','C','G','G','Am','C','D','G']
+
+def whistle(f, length):
+    n = int(length*SR); t = tt(n); a = np.minimum(t/.03, 1); r = np.ones(n); cut = max(1, int(n*.75)); r[cut:] = np.linspace(1, 0, n-cut)
+    vib = np.sin(2*np.pi*5.2*t) * .004 * np.minimum(t/.25, 1)
+    ph = 2*np.pi*f*np.cumsum(1 + vib)/SR
+    return (np.sin(ph) + .08*np.sin(2*ph)) * a * r * .8
+
+def shapes_long(dur, shift=0):
+    BEAT = .6; BAR = 3*BEAT; E = BEAT/2
+    tr = Track(dur)
+    CH = {'G': ('G2', ['G3','B3','D4','G4']), 'C': ('C3', ['C4','E4','G4','C5']), 'D': ('D3', ['A3','D4','F#4','A4']),
+          'Em': ('E3', ['B3','E4','G4','B4']), 'Am': ('A2', ['A3','C4','E4','A4'])}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(SH_A, SH_ACH), (SH_B, SH_BCH), (SH_A, SH_ACH), (None, ['C','G','Am','D','C','G','D','G'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'G'),(None,'D')] + body[:nb - 4] + [(SH_A[6], 'D'), ([('G5',6)], 'G')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch4 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch4]
+        tr.add(tri_bass(freq(root, shift), BEAT*.9 if not fin else BAR), t0, 0, .6)
+        if not fin:
+            tr.add(tri_bass(freq(root, shift)*1.5, BEAT*.8), t0 + 2*BEAT, 0, .4)
+            for b in (1, 2):
+                tr.add(pluck(fr, .35), t0 + b*BEAT, -.3, .38); tr.add(pluck(fr[1:], .25), t0 + b*BEAT + E, -.3, .22)
+                tr.add(shaker(), t0 + b*BEAT, .45, .45); tr.add(shaker(), t0 + b*BEAT + E, .45, .25)
+            if bi >= 2: tr.add(djembe_low(), t0, -.1, .45)
+        else: tr.add(pluck(fr, 2.0), t0, -.3, .45)
+        if mel is None and not fin and bi >= 2:
+            for k, n in enumerate([ch4[1], ch4[2], ch4[3]]): tr.add(kalimba([freq(n, shift + 12)], .9), t0 + k*BEAT, .3, .22)
+        if mel:
+            pos = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E + (1.4 if fin else .1)
+                    tr.add(whistle(f, L), t0 + pos*E, .1, .32); tr.add(marimba(f, L), t0 + pos*E, .15, .3)
+                pos += ln
+    return tr.buf
+
 def lullaby(dur):
     tmp = f'/tmp/claude-0/lull_{int(dur)}.wav'
     subprocess.run(['python3', os.path.join(os.path.dirname(__file__), '..', 'ep', 'bw_long_music.py'), tmp, str(dur)], check=True, capture_output=True, cwd=os.path.join(os.path.dirname(__file__), '..'))
