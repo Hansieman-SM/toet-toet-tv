@@ -6,3 +6,4 @@ out/
 !fonts/**
 *.log
 release/
+node_modules
