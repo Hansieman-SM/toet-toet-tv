@@ -31,3 +31,7 @@ rain forest at dusk, snowy forest / arctic (polar bears, penguins, seals), night
 ## TikTok (@toet.friends)
 - 2026-10-28 12:30 Shape Hunt · 17:30 Sleepy Elephant · 19:30 Under the Sea
 - 2026-10-29 12:30 Ella Helps Mouse · 17:30 Goodnight, Star!
+
+## English remakes of the Dutch videos (2026-10-28, jobs/en-remake-*.sh, scripts *_en.js via tools/make_en.py + en/translations.json)
+Little Truck Toet · The Big Four · Toet Counts Cows · Toet and the Colors · Toet Charges Up · Who Makes This Sound? · Peekaboo! · Who Is the Biggest? · Fun at the Playground · Visiting Grandpa and Grandma · Toet on Safari · Toet Climbs the Mountain · Toet and Bus Bas · Toet at the Car Wash · Toet Delivers the Cake · Toet Has a Flat Tire · Toet in the Rain · Toet Looks for Mama Duck · Good Night, Toet
+These are translations, not new themes. Scheduled one per day at 10:00 (see Metricool).
