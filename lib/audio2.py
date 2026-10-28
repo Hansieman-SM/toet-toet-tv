@@ -220,3 +220,61 @@ def make(name):
         try: args.append(float(a))
         except ValueError: args.append(a)
     return fn(*args)
+
+# ---------- "kind friends" (episode en02): gentle swing in F, pan flute lead, vibes, walking bass, brushes ----------
+KF_A = [[('C5',2),('F5',2),('A5',3),('G5',1)], [('F5',2),('D5',2),('A4',4)], [('D5',2),('F5',2),('A#5',3),('A5',1)], [('G5',6),('-',2)],
+        [('A5',2),('C6',2),('A5',2),('F5',2)], [('G5',3),('A#5',1),('A5',2),('G5',2)], [('E5',2),('G5',2),('C6',2),('A#5',2)], [('A5',6),('-',2)]]
+KF_ACH = ['F','Dm','A#','C','F','Gm','C','F']
+KF_B = [[('D6',3),('C6',1),('A#5',2),('A5',2)], [('C6',4),('A5',2),('F5',2)], [('A#5',3),('A5',1),('G5',2),('D5',2)], [('F5',4),('A5',4)],
+        [('F5',2),('G5',2),('A5',2),('A#5',2)], [('C6',3),('A5',1),('E5',4)], [('G5',2),('A5',2),('A#5',2),('E5',2)], [('F5',6),('-',2)]]
+KF_BCH = ['A#','F','Gm','Dm','A#','Am','C','F']
+
+def panflute(f, length):
+    n = int(length*SR); t = tt(n); a = np.minimum(t/.06, 1); r = np.ones(n); cut = max(1, int(n*.7)); r[cut:] = np.linspace(1, 0, n-cut)
+    vib = np.sin(2*np.pi*4.8*t) * .005 * np.minimum(t/.3, 1)
+    ph = 2*np.pi*f*np.cumsum(1 + vib)/SR
+    breath = band(rng.standard_normal(n), f*.8, f*3.5) * .12 * np.exp(-t/.12)
+    return (np.sin(ph) + .12*np.sin(2*ph) + .05*np.sin(3*ph) + breath) * a * r * .8
+
+def vibes(freqs, length):
+    n = int(length*SR); t = tt(n); e = envexp(n, .004, .9) * (1 + .25*np.sin(2*np.pi*5*t))
+    return sum(np.sin(2*np.pi*f*t) + .2*np.sin(2*np.pi*4*f*t)*np.exp(-t/.06) for f in freqs) * e / len(freqs)
+
+def brush_hit():
+    n = int(.25*SR); t = tt(n)
+    return band(rng.standard_normal(n), 900, 6000) * np.minimum(t/.008, 1) * np.exp(-t/.07) * .5
+
+def kind_long(dur, shift=0):
+    BEAT = .625; BAR = 4*BEAT; SW = BEAT*.62
+    tr = Track(dur)
+    CH = {'F': ('F2', ['A3','C4','F4']), 'Dm': ('D3', ['A3','D4','F4']), 'A#': ('A#2', ['A#3','D4','F4']), 'C': ('C3', ['G3','C4','E4']),
+          'Gm': ('G2', ['G3','A#3','D4']), 'Am': ('A2', ['A3','C4','E4'])}
+    pos_t = lambda p: (p // 2) * BEAT + (p % 2) * SW
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(KF_A, KF_ACH), (KF_B, KF_BCH), (KF_A, KF_ACH), (None, ['Dm','A#','F','C','Dm','Gm','C','C'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'F'),(None,'C')] + body[:nb - 4] + [(KF_A[6], 'C'), ([('F5',8)], 'F')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in tri]; rf = freq(root, shift)
+        if not fin:
+            for b, m in enumerate([1, 1.5, 2, 1.5]): tr.add(sine_bass(rf*m, BEAT*.85), t0 + b*BEAT, 0, .6)
+            tr.add(vibes(fr, BAR*.95), t0, -.35, .38)
+            for b in (1, 3): tr.add(pluck(fr, .22), t0 + b*BEAT + SW, -.2, .2)
+            if bi >= 2:
+                for b in (1, 3): tr.add(brush_hit(), t0 + b*BEAT, .3, .5)
+                for b in range(4): tr.add(shaker(), t0 + b*BEAT, .45, .3); tr.add(shaker(), t0 + b*BEAT + SW, .45, .2)
+                tr.add(djembe_low(), t0, -.1, .35)
+        else:
+            tr.add(sine_bass(rf, BAR), t0, 0, .6); tr.add(vibes(fr, BAR*1.2), t0, -.35, .45)
+        if mel is None and not fin and bi >= 2:
+            for k, n in enumerate(tri + [tri[1]]): tr.add(glock(freq(n, shift + 12), .9), t0 + k*BEAT, .3, .14)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*BEAT/2 + (1.4 if fin else .12)
+                    tr.add(panflute(f, L), t0 + pos_t(p), .1, .42); tr.add(mallet(f*2, min(L, .6), .3), t0 + pos_t(p), .25, .07)
+                p += ln
+    return tr.buf
