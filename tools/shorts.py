@@ -35,7 +35,7 @@ for name, src, a, b, t1, t2, (c1, c2), cx in CLIPS:
     d.rounded_rectangle([140, by, W - 140, by + 220], radius=50, fill='white', outline=INK, width=6)
     d.text((W/2, by + 75), 'Truckje Toet', font=font(60), fill='#ff7a45', anchor='mm')
     d.text((W/2, by + 150), 'Kijk de hele aflevering op ons kanaal!', font=font(40, 'Bold'), fill=INK, anchor='mm')
-    bgp = f'/tmp/claude-0/sh/{name}.png'; bg.save(bgp)
+    bgp = f'/tmp/{name}-bg.png'; bg.save(bgp)
     dur = b - a
     crop = f'crop=1440:1080:{cx - 720}:0,' if cx else ''
     vf = (f"[1:v]{crop}scale={vw}:{vh},fade=t=in:st=0:d=0.3,fade=t=out:st={dur - .6}:d=0.6[v];"

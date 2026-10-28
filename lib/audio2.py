@@ -1,5 +1,5 @@
 """Lange themamuziek en extra geluidseffecten voor Toet op avontuur."""
-import numpy as np, subprocess, wave, os
+import numpy as np, subprocess, wave, os, tempfile
 from audiolib import *
 
 TOET_A = [[('E5',1),('E5',1),('G5',2),('E5',1),('C5',1),('D5',2)], [('D5',1),('D5',1),('B4',1),('D5',1),('G5',3),('-',1)],
@@ -135,7 +135,7 @@ def shapes_long(dur, shift=0):
     return tr.buf
 
 def lullaby(dur):
-    tmp = f'/tmp/claude-0/lull_{int(dur)}.wav'
+    tmp = os.path.join(tempfile.gettempdir(), f'lull_{int(dur)}.wav')
     subprocess.run(['python3', os.path.join(os.path.dirname(__file__), '..', 'ep', 'bw_long_music.py'), tmp, str(dur)], check=True, capture_output=True, cwd=os.path.join(os.path.dirname(__file__), '..'))
     with wave.open(tmp) as w: a = np.frombuffer(w.readframes(w.getnframes()), '<i2').reshape(-1, 2).astype(np.float64) / 32767
     return a
