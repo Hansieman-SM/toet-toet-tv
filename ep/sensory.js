@@ -168,4 +168,5 @@ function draw(t) {
   const f = Math.max(fin ? clamp(1 - t / 3) : 0, fout ? clamp((t - (DUR - 6)) / 6) : 0);
   if (f > 0) { x.fillStyle = `rgba(0,0,0,${f})`; x.fillRect(0, 0, W, H); }
 }
-C.run(draw, DUR, {});
+if (require.main === module) C.run(draw, DUR, {});
+else module.exports = { elephant, babyElephant, owl, bunny, sheep, moon, tree, star5 };

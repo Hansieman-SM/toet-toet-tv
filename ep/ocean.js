@@ -289,4 +289,5 @@ function draw(t0) {
   const f = Math.max(fin ? clamp(1 - lt / 3) : 0, fout ? clamp((lt - (DUR - 6)) / 6) : 0);
   if (f > 0) { x.fillStyle = `rgba(0,0,0,${f})`; x.fillRect(0, 0, W, H); }
 }
-C.run(draw, DUR, {});
+if (require.main === module) C.run(draw, DUR, {});
+else module.exports = { fish, clownfish, dolphin, whale, shark, manta, turtle, jelly, seahorse, octopus, crab, starfish, anemone, kelp, coralBranch, brainCoral, fanCoral, rock };
