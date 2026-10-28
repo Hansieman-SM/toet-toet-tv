@@ -9,11 +9,11 @@ Owner: Hans (speaks Dutch – talk to him in Dutch). Channel: https://www.youtub
 - **Quality over quantity** (YouTube "inauthentic/mass-produced content" policy, July 2025). Every video must be clearly different: new scene, new animals/characters, new music. No near-copies.
 - All music and visuals are original code. No copyrighted characters, songs or melodies.
 - Truckje Toet / Little Truck Toet is an **electric** truck (no exhaust).
-- Uploads must stay under 400 MiB (file-send limit). tools/long.sh targets ~370 MiB for 90 min.
+- Metricool accepts max 500 MB per YouTube video; tools/long.sh targets ~480 MB for 90 min.
 
 ## Pipeline
 - `npm install` (needs @napi-rs/canvas), Python3 with numpy + scipy, ffmpeg.
-- World is 960x540, rendered at 1920x1080 (OW/OH env for other sizes). Font: fonts/Baloo2.ttf via lib/common.js.
+- World is 960x540. **Render episodes and Short sources at 2560x1440** (`OW=2560 OH=1440 node ...`, ffmpeg `-s 2560x1440`, `-preset slow -tune animation -crf 16` for episodes, `-crf 12` for Short sources) – YouTube gives 1440p uploads much sharper encodes (Hans wants razor-sharp video). Long calm videos stay 1920x1080 (tools/long.sh, 600k, < 480 MB because Metricool's YouTube limit is 500 MB). Font: fonts/Baloo2.ttf via lib/common.js.
 - Env: `STILL=<sec> node ep/x.js out.png` for a still; `DUR`, `FADEIN=1`, `FADEOUT=1`, `T0`.
 - Calm long videos: scene file where everything is periodic in P=240 s (see ep/ocean.js, ep/sensory.js), music script `python3 ep/<x>_music.py out.wav SECONDS` (see ep/ocean_music.py, ep/bw_long_music.py). Build with `tools/long.sh ep/scene.js "python3 ep/scene_music.py" out/<slug> 90`.
 - Thumbnails 1280x720: `STILL=5 OW=1280 OH=720 node ep/scene.js bg.png` then `OW=1280 OH=720 node tools/thumb2.js bg.png thumb.png "Title" "subtitle"`.
