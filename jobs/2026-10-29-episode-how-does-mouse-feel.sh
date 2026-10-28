@@ -1,5 +1,6 @@
 #!/bin/bash
 # Episode (EN): The Big Four – How Does Mouse Feel? (ep/en02_kind.js, feelings sad/happy, being kind, sharing, counting)
+# rev2 2026-10-28: 1440p + bubble margin
 set -e; S=2026-10-29-episode-how-does-mouse-feel; O=release/$S; mkdir -p $O
 python3 ep/mix.py ep/en02_kind.js $O/audio.wav
 OW=2560 OH=1440 node ep/en02_kind.js | ffmpeg -v error -y -f rawvideo -pix_fmt rgba -s 2560x1440 -r 30 -i - -i $O/audio.wav -c:v libx264 -preset slow -tune animation -crf 16 -pix_fmt yuv420p -c:a aac -b:a 192k -movflags +faststart -shortest $O/$S.mp4
