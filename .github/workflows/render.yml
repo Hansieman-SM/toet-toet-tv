@@ -28,11 +28,20 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if [ -n "${{ github.event.inputs.job }}" ]; then JOBS="jobs/${{ github.event.inputs.job }}.sh";
+          if [ -n "${{ github.event.inputs.job }}" ]; then JOBS=$(for j in ${{ github.event.inputs.job }}; do echo jobs/$j.sh; done);
           else JOBS=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD -- 'jobs/*.sh'); fi
+          FAILED=""; mkdir -p logs
           for j in $JOBS; do
             S=$(basename $j .sh); echo "== $S"
-            bash $j
-            gh release delete "$S" -y --cleanup-tag 2>/dev/null || true
-            gh release create "$S" release/$S/* --title "$S" --notes "Rendered by GitHub Actions"
+            if bash -x $j > logs/$S.log 2>&1; then
+              gh release delete "$S" -y --cleanup-tag 2>/dev/null || true
+              gh release create "$S" release/$S/* --title "$S" --notes "Rendered by GitHub Actions"
+            else
+              echo "FAILED $S"; tail -30 logs/$S.log; FAILED="$FAILED $S"
+            fi
           done
+          if [ -n "$FAILED" ]; then
+            gh release delete render-logs -y --cleanup-tag 2>/dev/null || true
+            gh release create render-logs logs/*.log --title render-logs --notes "Failed:$FAILED" --prerelease
+            exit 1
+          fi
