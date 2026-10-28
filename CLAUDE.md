@@ -17,7 +17,7 @@ Owner: Hans (speaks Dutch – talk to him in Dutch). Channel: https://www.youtub
 - Env: `STILL=<sec> node ep/x.js out.png` for a still; `DUR`, `FADEIN=1`, `FADEOUT=1`, `T0`.
 - Calm long videos: scene file where everything is periodic in P=240 s (see ep/ocean.js, ep/sensory.js), music script `python3 ep/<x>_music.py out.wav SECONDS` (see ep/ocean_music.py, ep/bw_long_music.py). Build with `tools/long.sh ep/scene.js "python3 ep/scene_music.py" out/<slug> 90`.
 - Thumbnails 1280x720: `STILL=5 OW=1280 OH=720 node ep/scene.js bg.png` then `OW=1280 OH=720 node tools/thumb2.js bg.png thumb.png "Title" "subtitle"`.
-- Shorts: vertical 1080x1920, ≤ 60 s, made with tools/short.py. Default = the WHOLE 16:9 frame (nothing cut off). `--crop --cx N` (4:3 crop) is ONLY allowed for footage without any text, speech bubbles or titles (e.g. calm scenes) and only if the QC sheet shows nothing cut.
+- Shorts: vertical 1440x2560, ≤ 60 s, made with tools/short.py from a 2560x1440 source. Default = the WHOLE 16:9 frame (nothing cut off). `--crop --cx N` (4:3 crop) is ONLY allowed for footage without any text, speech bubbles or titles (e.g. calm scenes) and only if the QC sheet shows nothing cut.
 - **QC is mandatory before scheduling anything (Hans, 2026-10-28: cut-off text is unprofessional and not allowed):** run `tools/qc.sh <video> <sheet.png>` on EVERY final video (also the released file from Actions) and look at the sheet. Reject and fix if any text, speech bubble, title, number or character is cut off, touches the frame edge, overlaps another text, or is unreadable. Only schedule after a clean QC. Never report a known visual problem to Hans as "acceptable" – fix it first.
 - Always look at stills/contact sheets of what you render before delivering (check overlaps, seams, fades).
 
@@ -35,4 +35,5 @@ Owner: Hans (speaks Dutch – talk to him in Dutch). Channel: https://www.youtub
 - Tue, Wed, Fri, Sat: 1 new English story episode (2–3 min) with Little Truck Toet or The Big Four + thumbnail.
 - Every day: 2 new vertical Shorts (≤ 60 s) via tools/short.py.
 - Always: quality check, English texts, render via Actions, schedule via Metricool for the next day, update CATALOG.md, commit + push, send Hans a short Dutch summary of what is scheduled when (with planner links).
+- Speech bubbles are clamped 40 px (world units) from the frame edge in lib/common.js bubble(); still place them sensibly.
 - ffmpeg on the GitHub runner is strict: write decimals with a leading zero in filters (`d=0.6`, never `d=.6`), otherwise it exits with code 234.
