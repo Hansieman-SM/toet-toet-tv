@@ -64,8 +64,8 @@ x.save(); x.translate(720, 500); x.scale(.5, .5); S.bush(0, 0, 1, 0); x.restore(
 
 // tekst in de veilige zone
 const fit = (txt, size, maxW) => { x.font = C.FONT(size); const w = x.measureText(txt).width; return w > maxW ? Math.floor(size * maxW / w) : size; };
-const t1 = 'Leren, lachen en meezingen!', t2 = 'Vrolijke tekenfilmpjes voor peuters en kleuters';
-C.bigText(t1, 480, 222, 1, fit(t1, 46, 540), '#ffd23f', INK);
+const t1 = 'Toet Toet and Friends', t2 = 'Happy cartoons and calm videos for little ones';
+C.bigText(t1, 480, 220, 1, fit(t1, 52, 540), '#ffd23f', INK);
 C.bigText(t2, 480, 260, 1, fit(t2, 24, 520), '#ffffff', INK);
 
 const out = process.argv[2];
