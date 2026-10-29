@@ -36,4 +36,5 @@ Owner: Hans (speaks Dutch – talk to him in Dutch). Channel: https://www.youtub
 - Every day: 2 new vertical Shorts (≤ 60 s) via tools/short.py.
 - Always: quality check, English texts, render via Actions, schedule via Metricool for the next day, update CATALOG.md, commit + push, send Hans a short Dutch summary of what is scheduled when (with planner links).
 - Speech bubbles are clamped 40 px (world units) from the frame edge in lib/common.js bubble(); still place them sensibly.
+- No voice-over (Hans, 2026-10-29: tested Kokoro TTS, rejected). Videos use music, sound effects and on-screen text only. tools/voiceover.py stays unused.
 - ffmpeg on the GitHub runner is strict: write decimals with a leading zero in filters (`d=0.6`, never `d=.6`), otherwise it exits with code 234.
