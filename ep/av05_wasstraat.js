@@ -69,7 +69,7 @@ St.episode({
         x.save(); x.translate(480, 105 + Math.sin(u * 1.3) * 30); x.rotate(Math.PI / 2); brush(0, -300, 300, c.t, '#ffd23f'); x.restore();
       },
       says: [['toet', 'Hihi! Dat kriebelt!', 6, 10, 520, 260], ['toet', 'Hahaha!', 13, 16, 520, 260], ['toet', 'Het is helemaal niet eng!', 24, 28.5, 520, 260]],
-      big: [['Schrob, schrob, schrob!', 16.6, 21.6, 480, 500, 54, '#ffffff']],
+      big: [['Schrob, schrob, schrob!', 16.6, 21.6, 480, 478, 54, '#ffffff']],
       sfx: [[0, 'brushes:30', .8], [1, 'spray:26', .6], [6, 'laugh', .7], [13, 'laugh', .7]] },
     { d: 28, draw: drive({ segs: [[0, 120], [6, 0]], dist0: 6000, bx: 200,
         front: (u, c) => { A.sparkles(c.bx + 75, c.Tk.by - 60, c.t, 12, 170); place(F.bus, 800, GY + 6, .55, true, 1, { flip: true, mouth: c.talk('bas'), blink: c.blink(1) }); } }),

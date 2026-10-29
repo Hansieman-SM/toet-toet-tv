@@ -32,7 +32,7 @@ St.episode({
         front: (u, c) => place(F.bus, D2 + BASX - c.dist, GY + 6, .8, true, 1, { flip: true, mouth: c.talk('bas'), blink: c.blink(1) }) }),
       says: [['toet', "Hi, Bas!", 7.5, 10, 300, 250], ['bas', "Hi, Toet! I'm Bus Bas.", 10.5, 14, BASX, 250],
              ['bas', "I take people to school and to work.", 14.5, 19.5, BASX - 60, 250, 24], ['toet', "Wow, you're so long!", 20, 23.5, 300, 250]],
-      big: [['Bus Bas', 10.5, 15, BASX, 515, 38, '#ffffff']], sfx: [[7.6, 'honk', .7], [10.5, 'honk', .5]] },
+      big: [['Bus Bas', 10.5, 15, BASX, 490, 38, '#ffffff']], sfx: [[7.6, 'honk', .7], [10.5, 'honk', .5]] },
     { d: 36, draw: drive({ segs: [[0, 0]], dist0: D2, bx: 120, behind: () => { station(600); busStop(910); },
         front: (u, c) => {
           const pass = ORDER.filter((_, i) => u > 3.5 + i * 4.5).length;

@@ -36,7 +36,7 @@ St.episode({
         } }),
       says: [['toet', 'Help! Wie kan mij helpen?', 1, 4.5, 360, 250], ['tim', 'Hallo! Ik ben Takel Tim.', 9, 12.5, 740, 250], ['tim', 'Ik help je wel!', 13, 16, 740, 250],
              ['toet', 'Oh, gelukkig!', 16.5, 19, 360, 250], ['tim', 'Ik breng je naar de garage.', 19.5, 23.5, 720, 250]],
-      big: [['Takel Tim', 9, 13, 760, 515, 38, '#ffffff']], sfx: [[4.6, 'whoosh', .4], [8.5, 'boing', .5], [9, 'arp', .5]] },
+      big: [['Takel Tim', 9, 13, 540, 425, 32, '#ffffff']], sfx: [[4.6, 'whoosh', .4], [8.5, 'boing', .5], [9, 'arp', .5]] },
     { d: 24, draw: drive({ segs: [[0, 120]], dist0: 4000, bx: 80, noToet: true,
         front: (u, c) => {
           const Tk = toetTilt(c, 80, -.035);

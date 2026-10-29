@@ -33,7 +33,7 @@ St.episode({
         behind: (u, c) => barn(DEND + 700 - c.dist),
         front: (u, c) => folks(u, c, { omaX: DEND + OMA - c.dist, opaX: DEND + OPA - c.dist }) }),
       says: [['toet', 'Opa! Oma!', 8.3, 11, ...TB], ['oma', 'Dag lieverd! Wat fijn dat je er bent!', 11.2, 14.6, OMA, 230, 26], ['opa', 'Brom brom! Welkom!', 13.2, 15.9, OPA - 40, 300, 26]],
-      big: [['Oma Tuf', 11.2, 15.6, OMA, 515, 36, '#ffffff'], ['Opa Brom', 12.6, 15.9, OPA, 515, 36, '#ffffff']],
+      big: [['Oma Tuf', 11.2, 15.6, OMA, 490, 36, '#ffffff'], ['Opa Brom', 12.6, 15.9, OPA, 490, 36, '#ffffff']],
       sfx: [[8.4, 'honk', .7], [13.4, 'puf', .6]] },
     { d: 26, draw: still({ front: (u, c) => folks(u, c, { puff: u < 6 }) }),
       says: [['opa', 'Vroeger reed ik op diesel. Puf, puf, puf!', 1, 5.6, OPA - 120, 280, 25], ['toet', 'Ik rijd op stroom. Stil en schoon!', 6, 10.5, ...TB],

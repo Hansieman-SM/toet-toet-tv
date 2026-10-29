@@ -34,7 +34,7 @@ St.episode({
         behind: (u, c) => barn(DEND + 700 - c.dist),
         front: (u, c) => folks(u, c, { omaX: DEND + OMA - c.dist, opaX: DEND + OPA - c.dist }) }),
       says: [['toet', "Grandpa! Grandma!", 8.3, 11, ...TB], ['oma', "Hello, sweetie! So nice to see you!", 11.2, 14.6, OMA, 230, 26], ['opa', "Vroom vroom! Welcome!", 13.2, 15.9, OPA - 40, 300, 26]],
-      big: [["Grandma Tuf", 11.2, 15.6, OMA, 515, 36, '#ffffff'], ["Grandpa Brom", 12.6, 15.9, OPA, 515, 36, '#ffffff']],
+      big: [["Grandma Tuf", 11.2, 15.6, OMA, 490, 36, '#ffffff'], ["Grandpa Brom", 12.6, 15.9, OPA, 490, 36, '#ffffff']],
       sfx: [[8.4, 'honk', .7], [13.4, 'puf', .6]] },
     { d: 26, draw: still({ front: (u, c) => folks(u, c, { puff: u < 6 }) }),
       says: [['opa', "I used to run on diesel. Puff, puff, puff!", 1, 5.6, OPA - 120, 280, 25], ['toet', "I run on electricity. Quiet and clean!", 6, 10.5, ...TB],
