@@ -278,3 +278,66 @@ def kind_long(dur, shift=0):
                     tr.add(panflute(f, L), t0 + pos_t(p), .1, .42); tr.add(mallet(f*2, min(L, .6), .3), t0 + pos_t(p), .25, .07)
                 p += ln
     return tr.buf
+
+# ---------- "opposites" (episode en03): bouncy oom-pah march in D, clarinet-like lead, reed-organ chords, tuba bass, xylophone, woodblock ----------
+OP_A = [[('A4',1),('D5',1),('F#5',1),('A5',1),('F#5',2),('D5',2)], [('E5',1),('F#5',1),('G5',2),('E5',4)], [('C#5',1),('E5',1),('A5',2),('G5',1),('F#5',1),('E5',2)], [('F#5',2),('E5',2),('D5',4)],
+        [('B4',1),('D5',1),('G5',2),('B5',2),('G5',2)], [('A5',2),('F#5',1),('D5',1),('A5',4)], [('G5',1),('F#5',1),('E5',1),('D5',1),('C#5',2),('E5',2)], [('D5',6),('-',2)]]
+OP_ACH = ['D','A','A','D','G','D','A','D']
+OP_B = [[('F#5',2),('-',2),('D5',2),('-',2)], [('G5',2),('-',2),('E5',2),('-',2)], [('A5',1),('B5',1),('A5',1),('G5',1),('F#5',4)], [('E5',2),('F#5',2),('A4',4)],
+        [('D6',2),('B5',2),('G5',2),('B5',2)], [('A5',2),('F#5',2),('D5',4)], [('E5',2),('G5',2),('C#5',2),('E5',2)], [('D5',4),('A4',2),('D5',2)]]
+OP_BCH = ['D','Em','A','A','G','D','A','D']
+
+def clarinet(f, length):
+    n = int(length*SR); t = tt(n); a = np.minimum(t/.03, 1); r = np.ones(n); cut = max(1, int(n*.8)); r[cut:] = np.linspace(1, 0, n-cut)
+    vib = np.sin(2*np.pi*5.5*t) * .004 * np.minimum(t/.3, 1)
+    ph = 2*np.pi*f*np.cumsum(1 + vib)/SR
+    return (np.sin(ph) + .45*np.sin(3*ph) + .2*np.sin(5*ph) + .08*np.sin(7*ph)) * a * r * .5
+
+def reed(freqs, length):
+    n = int(length*SR); t = tt(n); a = np.minimum(t/.02, 1) * np.exp(-t/.5)
+    return sum(np.sin(2*np.pi*f*t) + .35*np.sin(4*np.pi*f*t) + .15*np.sin(6*np.pi*f*t) for f in freqs) * a / len(freqs) * .7
+
+def tuba(f, length):
+    n = int(length*SR); t = tt(n); a = np.minimum(t/.015, 1) * np.exp(-t/.35)
+    return (np.sin(2*np.pi*f*t) + .3*np.sin(4*np.pi*f*t)) * a
+
+def woodblock(pitch=1.0):
+    n = int(.12*SR); t = tt(n)
+    return (np.sin(2*np.pi*900*pitch*t) + .5*np.sin(2*np.pi*1650*pitch*t)) * np.exp(-t/.025) * .6
+
+def xylo(f, length):
+    n = int(min(length, .5)*SR); t = tt(n)
+    return (np.sin(2*np.pi*f*t) + .3*np.sin(2*np.pi*3.9*f*t)*np.exp(-t/.03)) * np.exp(-t/.12)
+
+def opp_long(dur, shift=0):
+    BEAT = .5; BAR = 4*BEAT; E = BEAT/2
+    tr = Track(dur)
+    CH = {'D': ('D2', 'A2', ['F#3','A3','D4']), 'A': ('A2', 'E2', ['E3','A3','C#4']), 'G': ('G2', 'D2', ['G3','B3','D4']),
+          'Em': ('E2', 'B2', ['E3','G3','B3'])}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(OP_A, OP_ACH), (OP_B, OP_BCH), (OP_A, OP_ACH), (None, ['G','D','Em','A','G','D','A','A'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'D'),(None,'A')] + body[:nb - 4] + [(OP_A[6], 'A'), ([('D5',8)], 'D')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; r1, r2, tri = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in tri]
+        if not fin:
+            for b in range(4):
+                tr.add(tuba(freq(r1 if b % 2 == 0 else r2, shift), BEAT*.8), t0 + b*BEAT, 0, .55)   # oom
+                tr.add(reed(fr, BEAT*.45), t0 + b*BEAT + E, -.3, .3)                                 # pah
+            if bi >= 2:
+                for b in range(4): tr.add(woodblock(1.0 if b % 2 else 1.25), t0 + b*BEAT + (E if b == 3 else 0), .4, .35)
+                tr.add(kick(), t0, 0, .5); tr.add(kick(), t0 + 2*BEAT, 0, .4)
+        else:
+            tr.add(tuba(freq(r1, shift), BAR), t0, 0, .6); tr.add(reed(fr, BAR), t0, -.3, .4)
+        if mel is None and not fin and bi >= 2:
+            for k, n in enumerate([tri[0], tri[1], tri[2], tri[1]]): tr.add(xylo(freq(n, shift + 12), .5), t0 + k*BEAT, .3, .3)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E + (1.4 if fin else .05)
+                    tr.add(clarinet(f, L), t0 + p*E, .1, .38); tr.add(xylo(f*2, L), t0 + p*E, .2, .12)
+                p += ln
+    return tr.buf
