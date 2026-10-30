@@ -1,5 +1,6 @@
 #!/bin/bash
 # Episode (EN): Little Truck Toet – Big and Small, Fast and Slow! (ep/en03_opposites.js: opposites big/small, fast/slow, up/down, loud/quiet; new oom-pah march music)
+# rev2 2026-10-30: speech bubbles moved off the bunny/snail/balloon
 set -e; S=2026-10-31-episode-big-and-small-fast-and-slow; O=release/$S; mkdir -p $O
 python3 ep/mix.py ep/en03_opposites.js $O/audio.wav
 OW=2560 OH=1440 node ep/en03_opposites.js | ffmpeg -v error -y -f rawvideo -pix_fmt rgba -s 2560x1440 -r 30 -i - -i $O/audio.wav -c:v libx264 -preset slow -tune animation -crf 16 -pix_fmt yuv420p -c:a aac -b:a 192k -movflags +faststart -shortest $O/$S.mp4

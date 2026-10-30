@@ -145,9 +145,9 @@ St.episode({
           // the snail: crawls very slowly next to the road
           snail(off + 610 + Math.max(0, u - 7) * 3, 434, 1.05, c.t);
         } }),
-      says: [['toet', 'Whoosh! Who was that?', 9.8, 13.2, ...TB], ['bunny', 'Me! I am fast!', 13.4, 16.6, 860, 330],
-             ['snail', 'I am slow... very slow!', 18, 22, 660, 350], ['toet', 'Fast and slow! Opposites!', 22.4, 26.6, ...TB]],
-      big: [['Fast!', 14.2, 17.6, 820, 245, 66, '#4cc9f0'], ['Slow...', 18.4, 22.4, 660, 255, 58, '#4cc9f0']],
+      says: [['toet', 'Whoosh! Who was that?', 9.8, 13.2, ...TB], ['bunny', 'Me! I am fast!', 13.4, 16.6, 860, 285],
+             ['snail', 'I am slow... very slow!', 18, 22, 660, 300], ['toet', 'Fast and slow! Opposites!', 22.4, 26.6, ...TB]],
+      big: [['Fast!', 14.2, 17.6, 820, 200, 66, '#4cc9f0'], ['Slow...', 18.4, 22.4, 660, 215, 58, '#4cc9f0']],
       sfx: [[3, 'honk', .6], [7.8, 'whoosh', .6], [11.6, 'whoosh', .6], [14.2, 'boing', .5], [18.4, 'chime:G4', .4], [22.6, 'chime:C6', .4], [28, 'honk', .5]] },
 
     // UP & DOWN – a friendly hot-air balloon goes up, up, up ... and down, down, down
@@ -158,7 +158,7 @@ St.episode({
           ell(px, 432, 50 - h * 20, 6, `rgba(0,0,0,${.15 - h * .08})`);
           balloon(px, lerp(318, 120, h), c.t, .95, -2);
         } }),
-      says: [['toet', 'Oh! A big balloon!', 7.5, 10.8, ...TB], ['balloon', 'Up I go!', 11, 13.6, 820, 225],
+      says: [['toet', 'Oh! A big balloon!', 7.5, 10.8, ...TB], ['balloon', 'Up I go!', 11, 13.6, 880, 240],
              ['balloon', 'And down I come!', 16.6, 19.4, 500, 110], ['toet', 'Up and down! Opposites!', 24.6, 28.4, ...TB]],
       big: [['Up!', 13.2, 18, 860, 80, 70, '#ffd23f'], ['Down!', 20.4, 24.2, 495, 265, 66, '#ffd23f']],
       sfx: [[3, 'honk', .6], [11, 'whoosh', .5], [13.3, 'chime:C6', .4], [14.6, 'chime:E6', .4], [15.9, 'chime:G6', .4],
