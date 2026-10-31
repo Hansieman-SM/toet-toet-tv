@@ -148,7 +148,7 @@ function card(lines, k) {
   x.restore();
 }
 
-function draw() {
+function draw0() {
   const p = (0.1 + t / 54) % 1, s = sky(p), n = s.night;
   const g = x.createLinearGradient(0, 0, 0, ROAD); g.addColorStop(0, s.top); g.addColorStop(1, s.bot);
   x.fillStyle = g; x.fillRect(0, 0, W, H);
@@ -199,6 +199,8 @@ function draw() {
   if (fade > 0) { x.fillStyle = `rgba(0,0,0,${fade})`; x.fillRect(0, 0, W, H); }
 }
 
+const __SP = require('./lib/common').subscribePill;
+function draw() { draw0(); if (process.env.SUBSCRIBE) __SP(x, t, DUR, canvas.width, canvas.height); }
 if (process.env.STILL) {
   // rendert één beeld op tijdstip STILL naar het opgegeven pad
   const target = +process.env.STILL, dt = 1 / FPS;

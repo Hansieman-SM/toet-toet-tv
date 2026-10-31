@@ -9,7 +9,7 @@ mkdir -p $OUT; NAME=$(basename $OUT)
 R="-c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -r 30"
 FADEIN=1 DUR=240 node $SCENE | ffmpeg -v error -y -f rawvideo -pix_fmt rgba -s 1920x1080 -r 30 -i - $R $OUT/raw_intro.mp4 &
 DUR=240 node $SCENE | ffmpeg -v error -y -f rawvideo -pix_fmt rgba -s 1920x1080 -r 30 -i - $R $OUT/raw_loop.mp4 &
-FADEOUT=1 DUR=120 node $SCENE | ffmpeg -v error -y -f rawvideo -pix_fmt rgba -s 1920x1080 -r 30 -i - $R $OUT/raw_outro.mp4 &
+SUBSCRIBE=1 FADEOUT=1 DUR=120 node $SCENE | ffmpeg -v error -y -f rawvideo -pix_fmt rgba -s 1920x1080 -r 30 -i - $R $OUT/raw_outro.mp4 &
 $MUSIC $OUT/music.wav $SEC > $OUT/music.log &
 wait
 O="-c:v libx264 -preset slow -tune animation -b:v 600k -pix_fmt yuv420p -r 30 -g 300 -an"

@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 p = argparse.ArgumentParser(); p.add_argument('src'); p.add_argument('out')
 p.add_argument('--title', required=True); p.add_argument('--sub', default=''); p.add_argument('--cx', type=int, default=960); p.add_argument('--crop', action='store_true', help='4:3 crop around --cx; ONLY for footage without text/speech bubbles')
 p.add_argument('--colors', default='#bfe6f0,#4b6aa6'); p.add_argument('--footer1', default='Toet Toet and Friends TV')
-p.add_argument('--footer2', default='Watch the full video on our channel!'); a = p.parse_args()
+p.add_argument('--footer2', default='Subscribe for more adventures!'); a = p.parse_args()
 def font(sz, w='ExtraBold'):
     f = ImageFont.truetype('fonts/Baloo2.ttf', sz); f.set_variation_by_name(w); return f
 INK = '#1d3557'; K = 4 / 3; W, H = 1440, 2560; c1, c2 = a.colors.split(',')   # ontwerp in 1080x1920-maat, uitvoer 1440x2560 (scherper op YouTube)

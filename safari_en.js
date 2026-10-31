@@ -249,7 +249,7 @@ function actor(a, xpos, mv, act, sc) {
   x.restore();
 }
 
-function draw() {
+function draw0() {
   let signArgs = null;
   sky(); land();
   const fin = t >= 52.5;
@@ -283,6 +283,8 @@ function draw() {
   if (fade > 0) { x.fillStyle = `rgba(0,0,0,${fade})`; x.fillRect(0, 0, W, H); }
 }
 
+const __SP = require('./lib/common').subscribePill;
+function draw() { draw0(); if (process.env.SUBSCRIBE) __SP(x, t, DUR, cv.width, cv.height); }
 if (process.env.STILL) {
   t = +process.env.STILL; draw();
   require('fs').writeFileSync(process.argv[2], cv.toBuffer('image/png'));
