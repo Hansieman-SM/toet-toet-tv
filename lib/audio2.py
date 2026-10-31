@@ -341,3 +341,63 @@ def opp_long(dur, shift=0):
                     tr.add(clarinet(f, L), t0 + p*E, .1, .38); tr.add(xylo(f*2, L), t0 + p*E, .2, .12)
                 p += ln
     return tr.buf
+
+# ---------- "weather" (episode en04): sunny calypso in G, steel-pan lead, marimba off-beats, ukulele strum, bass, congas + shaker ----------
+WE_A = [[('B4',1),('D5',1),('G5',2),('B5',1),('A5',1),('G5',2)], [('E5',1),('G5',1),('C6',2),('B5',1),('A5',3)], [('A4',1),('D5',1),('F#5',2),('A5',1),('G5',1),('F#5',2)], [('G5',3),('D5',1),('B4',4)],
+        [('B4',1),('D5',1),('G5',2),('B5',2),('D6',2)], [('C6',1),('B5',1),('A5',1),('G5',1),('E5',4)], [('D5',1),('E5',1),('F#5',1),('A5',1),('G5',1),('F#5',1),('E5',1),('F#5',1)], [('G5',6),('-',2)]]
+WE_ACH = ['G','C','D','G','G','Em','D','G']
+WE_B = [[('E5',2),('G5',1),('E5',1),('C6',2),('B5',2)], [('A5',2),('G5',1),('E5',1),('D5',4)], [('C5',1),('E5',1),('G5',1),('A5',1),('B5',2),('A5',2)], [('G5',2),('E5',2),('D5',4)],
+        [('E5',1),('E5',1),('G5',2),('C6',1),('C6',1),('B5',2)], [('A5',1),('B5',1),('A5',1),('G5',1),('D5',4)], [('C5',1),('D5',1),('E5',1),('F#5',1),('A5',2),('F#5',2)], [('G5',4),('D5',2),('G5',2)]]
+WE_BCH = ['C','G','Am','D','C','G','D','G']
+
+def steelpan(f, length):
+    n = int(min(length, 1.6)*SR); t = tt(n)
+    e = np.minimum(t/.004, 1) * np.exp(-t/.45)
+    return (np.sin(2*np.pi*f*t) + .5*np.sin(2*np.pi*2*f*t)*np.exp(-t/.25) + .25*np.sin(2*np.pi*3.01*f*t)*np.exp(-t/.12)
+            + .15*np.sin(2*np.pi*1.5*f*t)*np.exp(-t/.08)) * e * .55
+
+def uke(freqs, length=.3, down=True):
+    n = int(length*SR); out = np.zeros(n); fs = freqs if down else freqs[::-1]
+    for i, f in enumerate(fs):
+        o = int(i*.012*SR); m = n - o; t = tt(m)
+        out[o:] += (np.sin(2*np.pi*f*t) + .4*np.sin(4*np.pi*f*t) + .2*np.sin(6*np.pi*f*t)) * np.exp(-t/.14)
+    return out / len(freqs) * .6
+
+def conga(high=False):
+    n = int(.25*SR); t = tt(n); f0 = 330 if high else 220
+    return np.sin(2*np.pi*np.cumsum(f0 + 60*np.exp(-t/.02))/SR) * np.exp(-t/(.09 if high else .13)) * .8
+
+def weather_long(dur, shift=0):
+    BEAT = .5; BAR = 4*BEAT; E = BEAT/2
+    tr = Track(dur)
+    CH = {'G': ('G2', ['G3','B3','D4']), 'C': ('C3', ['G3','C4','E4']), 'D': ('D3', ['F#3','A3','D4']),
+          'Em': ('E2', ['G3','B3','E4']), 'Am': ('A2', ['A3','C4','E4'])}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(WE_A, WE_ACH), (WE_B, WE_BCH), (WE_A, WE_ACH), (None, ['C','D','G','Em','C','D','G','G'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'G'),(None,'D')] + body[:nb - 4] + [(WE_A[6], 'D'), ([('G5',8)], 'G')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in tri]; rf = freq(root, shift)
+        if not fin:
+            # calypso bass: 1, (and of 2), 3
+            for p, m in [(0, 1), (3, 1), (4, 1.5), (6, 2)]: tr.add(sine_bass(rf*m, E*1.6), t0 + p*E, 0, .55)
+            for p, dn in [(0, 1), (2, 1), (3, 0), (5, 0), (6, 1)]: tr.add(uke(fr, .3, bool(dn)), t0 + p*E, -.3, .28)
+            for p in (1, 3, 5, 7): tr.add(marimba(fr[2]*2 if p % 4 == 1 else fr[1]*2, .25), t0 + p*E, .35, .12)
+            if bi >= 2:
+                for p, hi in [(0, 0), (3, 1), (4, 1), (6, 0), (7, 1)]: tr.add(conga(bool(hi)), t0 + p*E, .2 if hi else -.15, .4)
+                for p in range(8): tr.add(shaker(), t0 + p*E, .45, .22 if p % 2 else .32)
+        else:
+            tr.add(sine_bass(rf, BAR), t0, 0, .6); tr.add(uke(fr, BAR), t0, -.3, .4)
+        if mel is None and not fin and bi >= 2:
+            for k, n in enumerate([tri[2], tri[1], tri[2], tri[0]]): tr.add(steelpan(freq(n, shift + 12), .6), t0 + k*BEAT + (E if k % 2 else 0), .2, .22)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E + (1.4 if fin else .1)
+                    tr.add(steelpan(f, L), t0 + p*E, .1, .45)
+                    if ln >= 2 and not fin: tr.add(steelpan(f, .3), t0 + p*E + E, .1, .18)   # pan "roll" echo
+                p += ln
+    return tr.buf
