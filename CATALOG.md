@@ -49,3 +49,10 @@ Little Truck Toet · The Big Four · Toet Counts Cows · Toet and the Colors · 
 These are translations, not new themes. Scheduled one per day at 10:00 (see Metricool).
 
 2026-10-29: name labels moved away from the bottom edge (Grandma Tuf/Grandpa Brom, Bus Bas, Scrub scrub scrub, Tow Truck Tim) and those 4 remakes re-rendered.
+
+## Holidays
+| Date | Title | Source | Posted |
+|---|---|---|---|
+| 2026-10-31 | Happy Halloween! Toet's Pumpkin Party (Short) | ep/halloween.js | YT 2026-10-31 12:20 · TikTok 12:30 |
+
+Holiday calendar for the daily task (make ~3 days ahead, gentle, never scary): Sinterklaas (Dec 5, optional), Christmas (Dec 25), New Year (Jan 1), Valentine's (Feb 14, friendship theme), Easter, Halloween (Oct 31).
