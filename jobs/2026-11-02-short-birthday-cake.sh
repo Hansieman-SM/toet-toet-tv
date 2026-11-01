@@ -1,0 +1,8 @@
+#!/bin/bash
+# Short: Birthday Cake! – Toet lets the ducks cross, brings the cake to Amara's party, count the 4 candles (from ep/av06_taart_en.js, 42–99.3 s, full 16:9 frame)
+set -e; S=2026-11-02-short-birthday-cake; O=release/$S; mkdir -p $O
+python3 ep/mix.py ep/av06_taart_en.js $O/audio.wav
+OW=2560 OH=1440 node ep/av06_taart_en.js | ffmpeg -v error -y -f rawvideo -pix_fmt rgba -s 2560x1440 -r 30 -i - -i $O/audio.wav -c:v libx264 -preset slow -tune animation -crf 12 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest $O/full.mp4
+ffmpeg -v error -y -ss 42 -t 57.3 -i $O/full.mp4 -vf "fade=in:st=0:d=0.5,fade=out:st=56.3:d=1" -af "afade=in:st=0:d=0.5,afade=out:st=55.8:d=1.5" -c:v libx264 -preset slow -tune animation -crf 12 -pix_fmt yuv420p -c:a aac -b:a 192k $O/src.mp4
+python3 tools/short.py $O/src.mp4 $O/$S.mp4 --title "Birthday Cake!" --sub "Count the candles with Toet!" --colors "#ffd6e4,#ff8fb1"
+rm -f $O/full.mp4 $O/src.mp4 $O/audio.wav $O/*.bg.png
