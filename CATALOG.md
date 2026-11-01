@@ -33,6 +33,8 @@
 | 2026-10-31 | Rainy Day Splash! – 1, 2, 3 puddles & a rainbow! | ep/en04_weather.js 80–131 s | YT 2026-11-01 12:00 · TikTok 12:30 |
 | 2026-10-31 | Where Is Mama Duck? – Help Little Truck Toet look! | ep/av09_eend_en.js 72.5–118 s | YT 2026-11-01 17:00 · TikTok 17:30 |
 | 2026-10-28 | Goodnight, Star! – What is in the present? | ep/en01_shapes.js 115.4–152.4 s | YT 2026-10-29 17:00 · TikTok 17:30 |
+| 2026-11-01 | Who Is the Biggest? – Big, bigger, biggest! | ep/e6_grootst_en.js 3–58.5 s | YT 2026-11-02 12:00 · TikTok 12:30 |
+| 2026-11-01 | Birthday Cake! – Count the candles with Toet! | ep/av06_taart_en.js 42–99.3 s | YT 2026-11-02 17:00 · TikTok 17:30 |
 
 ## Theme ideas not used yet
 rain forest at dusk, snowy forest / arctic (polar bears, penguins, seals), night farm, space & planets with friendly astronaut animals, savanna sunset (Big Four sleeping), rainy window & cozy room, hot-air balloons over hills, aquarium/koi pond, butterflies & flower garden, bedtime train journey with Toet (night countryside).
@@ -43,6 +45,7 @@ rain forest at dusk, snowy forest / arctic (polar bears, penguins, seals), night
 - 2026-10-30 12:30 Autumn Forest · 17:30 Who Can Help Toet?
 - 2026-10-31 12:30 Fast or Slow? · 17:30 Scrub, Scrub, Scrub!
 - 2026-11-01 12:30 Rainy Day Splash! · 17:30 Where Is Mama Duck?
+- 2026-11-02 12:30 Who Is the Biggest? · 17:30 Birthday Cake!
 
 ## English remakes of the Dutch videos (2026-10-28, jobs/en-remake-*.sh, scripts *_en.js via tools/make_en.py + en/translations.json)
 Little Truck Toet · The Big Four · Toet Counts Cows · Toet and the Colors · Toet Charges Up · Who Makes This Sound? · Peekaboo! · Who Is the Biggest? · Fun at the Playground · Visiting Grandpa and Grandma · Toet on Safari · Toet Climbs the Mountain · Toet and Bus Bas · Toet at the Car Wash · Toet Delivers the Cake · Toet Has a Flat Tire · Toet in the Rain · Toet Looks for Mama Duck · Good Night, Toet
