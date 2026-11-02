@@ -51,6 +51,7 @@ rain forest at dusk, snowy forest / arctic (polar bears, penguins, seals), night
 Little Truck Toet · The Big Four · Toet Counts Cows · Toet and the Colors · Toet Charges Up · Who Makes This Sound? · Peekaboo! · Who Is the Biggest? · Fun at the Playground · Visiting Grandpa and Grandma · Toet on Safari · Toet Climbs the Mountain · Toet and Bus Bas · Toet at the Car Wash · Toet Delivers the Cake · Toet Has a Flat Tire · Toet in the Rain · Toet Looks for Mama Duck · Good Night, Toet
 These are translations, not new themes. Scheduled one per day at 10:00 (see Metricool).
 
+2026-11-02: remakes for 2026-11-03..17 re-rendered with the channel badge next to the subscribe pill (rev4) and replaced in Metricool (same posts/uuids).
 2026-10-29: name labels moved away from the bottom edge (Grandma Tuf/Grandpa Brom, Bus Bas, Scrub scrub scrub, Tow Truck Tim) and those 4 remakes re-rendered.
 
 ## Holidays
@@ -59,3 +60,11 @@ These are translations, not new themes. Scheduled one per day at 10:00 (see Metr
 | 2026-10-31 | Happy Halloween! Toet's Pumpkin Party (Short) | ep/halloween.js | YT 2026-10-31 12:20 · TikTok 12:30 |
 
 Holiday calendar for the daily task (make ~3 days ahead, gentle, never scary): NO Sinterklaas (Hans, 2026-11-02). Christmas in December WITH Santa Claus (Hans wants Santa; original design, friendly, no copyrighted versions) – several Christmas items through December, from early December up to Dec 25, New Year (Jan 1), Valentine's (Feb 14, friendship theme), Easter, Halloween (Oct 31).
+
+## Daily black & white sensory (90 min, 19:30, YouTube only – themes in bw/THEMES.md)
+| Date | Title | Source | Posted |
+|---|---|---|---|
+| 2026-11-02 | Ocean Friends – B&W Baby Sensory #1 (whale, jellyfish, turtle, octopus, seahorse, crab, starfish, dolphin, pufferfish, striped fish; harp/celesta/cello + sea waves; last 20 min dimmer) | ep/bwd_ocean.js + ep/bwd_ocean_music.py | YT 2026-11-03 19:30 |
+
+## Instagram (@toet.friends, since 2026-11-02)
+- 2026-11-02 12:15 Reel: Who Is the Biggest? · 17:15 Reel: Birthday Cake!
