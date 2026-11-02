@@ -18,6 +18,7 @@
 | 2026-10-30 | Story ep (2:37) | Big and Small, Fast and Slow! – Little Truck Toet learns opposites: big Mama Duck & small Baby Duck, fast bunny & slow snail, hot-air balloon up & down, loud TOOT wakes Baby Bird → quiet toot; night recap of 4 pairs. New oom-pah march music (opp_long: clarinet, reed organ, tuba, xylophone, woodblock). YT 2026-10-31 16:00 | EN | ep/en03_opposites.js |
 | 2026-10-31 | Story ep (2:26) | What's the Weather? – The Big Four: sunny & hot (Ella sprays cool water), windy (leaves, everyone leans, Boris's kite), rainy (Leo & Boris under the tree, Nico jumps in 1-2-3 puddles), rainbow with 6 named colours; recap of 4 weather icons. New calypso music (weather_long: steel pan, ukulele, marimba, congas). YT 2026-11-01 16:00 | EN | ep/en04_weather.js |
 | 2026-10-26 | 90 min | Under the Sea – calm ocean animals (whale, dolphins, shark, manta, turtle, jellyfish, seahorse, clownfish, octopus, crab) | EN | ep/ocean.js |
+| 2026-11-02 | 90 min | Snowy Northern Lights – polar bear mama + cub with snowball, penguin family waddling, seal on ice floe, beluga hello, sleeping arctic fox, snowy owl, sliding baby penguin, arctic hare, snowman, igloo, sleepy crescent moon, pastel aurora, falling snow. New music: felt piano, glass-harmonica pad, FM electric piano, snowflake tinkles, bowed bass, airy wind (4/4, 56 bpm, E♭). YT 2026-11-03 18:30 | EN | ep/arctic.js + ep/arctic_music.py |
 
 ## Shorts (English)
 | Date made | Title | Source | Scheduled |
@@ -35,9 +36,11 @@
 | 2026-10-28 | Goodnight, Star! – What is in the present? | ep/en01_shapes.js 115.4–152.4 s | YT 2026-10-29 17:00 · TikTok 17:30 |
 | 2026-11-01 | Who Is the Biggest? – Big, bigger, biggest! | ep/e6_grootst_en.js 3–58.5 s | YT 2026-11-02 12:00 · TikTok 12:30 |
 | 2026-11-01 | Birthday Cake! – Count the candles with Toet! | ep/av06_taart_en.js 42–99.3 s | YT 2026-11-02 17:00 · TikTok 17:30 |
+| 2026-11-02 | Snowy Friends – Who lives in the snow? | ep/arctic.js T0=30, 45 s | YT 2026-11-03 12:00 · TikTok 12:30 (Instagram not scheduled) |
+| 2026-11-02 | Wheee, Downhill! – Watch Toet's battery fill up! | ep/av03_berg_en.js 56.4–115.8 s | YT 2026-11-03 17:00 · TikTok 17:30 (Instagram not scheduled) |
 
 ## Theme ideas not used yet
-rain forest at dusk, snowy forest / arctic (polar bears, penguins, seals), night farm, space & planets with friendly astronaut animals, savanna sunset (Big Four sleeping), rainy window & cozy room, hot-air balloons over hills, aquarium/koi pond, butterflies & flower garden, bedtime train journey with Toet (night countryside).
+rain forest at dusk, night farm, space & planets with friendly astronaut animals, savanna sunset (Big Four sleeping), rainy window & cozy room, hot-air balloons over hills, aquarium/koi pond, butterflies & flower garden, bedtime train journey with Toet (night countryside).
 
 ## TikTok (@toet.friends)
 - 2026-10-28 12:30 Shape Hunt · 17:30 Sleepy Elephant · 19:30 Under the Sea
@@ -46,6 +49,7 @@ rain forest at dusk, snowy forest / arctic (polar bears, penguins, seals), night
 - 2026-10-31 12:30 Fast or Slow? · 17:30 Scrub, Scrub, Scrub!
 - 2026-11-01 12:30 Rainy Day Splash! · 17:30 Where Is Mama Duck?
 - 2026-11-02 12:30 Who Is the Biggest? · 17:30 Birthday Cake!
+- 2026-11-03 12:30 Snowy Friends · 17:30 Wheee, Downhill!
 
 ## English remakes of the Dutch videos (2026-10-28, jobs/en-remake-*.sh, scripts *_en.js via tools/make_en.py + en/translations.json)
 Little Truck Toet · The Big Four · Toet Counts Cows · Toet and the Colors · Toet Charges Up · Who Makes This Sound? · Peekaboo! · Who Is the Biggest? · Fun at the Playground · Visiting Grandpa and Grandma · Toet on Safari · Toet Climbs the Mountain · Toet and Bus Bas · Toet at the Car Wash · Toet Delivers the Cake · Toet Has a Flat Tire · Toet in the Rain · Toet Looks for Mama Duck · Good Night, Toet
