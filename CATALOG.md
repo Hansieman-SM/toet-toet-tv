@@ -58,4 +58,4 @@ These are translations, not new themes. Scheduled one per day at 10:00 (see Metr
 |---|---|---|---|
 | 2026-10-31 | Happy Halloween! Toet's Pumpkin Party (Short) | ep/halloween.js | YT 2026-10-31 12:20 · TikTok 12:30 |
 
-Holiday calendar for the daily task (make ~3 days ahead, gentle, never scary): Sinterklaas (Dec 5, optional), Christmas (Dec 25), New Year (Jan 1), Valentine's (Feb 14, friendship theme), Easter, Halloween (Oct 31).
+Holiday calendar for the daily task (make ~3 days ahead, gentle, never scary): NO Sinterklaas (Hans, 2026-11-02). Christmas in December WITH Santa Claus (Hans wants Santa; original design, friendly, no copyrighted versions) – several Christmas items through December, from early December up to Dec 25, New Year (Jan 1), Valentine's (Feb 14, friendship theme), Easter, Halloween (Oct 31).
