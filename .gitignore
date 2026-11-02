@@ -7,3 +7,4 @@ out/
 *.log
 release/
 node_modules
+__pycache__/
