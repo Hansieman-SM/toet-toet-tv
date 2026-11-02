@@ -33,6 +33,10 @@ jobs:
           FAILED=""; mkdir -p logs
           for j in $JOBS; do
             S=$(basename $j .sh); echo "== $S"
+            case $S in *-episode-*|*-long-*|en-remake-*)
+              if ! grep -qE 'SUBSCRIBE=1|tools/long.sh|tools/build_en.sh' $j; then
+                echo "FAILED $S: final render has no SUBSCRIBE=1 (subscribe pill + badge missing)" | tee logs/$S.log; FAILED="$FAILED $S"; continue; fi;;
+            esac
             if bash -x $j > logs/$S.log 2>&1; then
               gh release delete "$S" -y --cleanup-tag 2>/dev/null || true
               gh release create "$S" release/$S/* --title "$S" --notes "Rendered by GitHub Actions"
