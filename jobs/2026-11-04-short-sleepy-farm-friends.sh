@@ -1,5 +1,6 @@
 #!/bin/bash
 # Short: Sleepy Farm Friends – black & white goat, duck and sleeping cat, then the sleepy moon (from ep/bwd_farm.js, loop T0=36, 45 s; no text in the source, full 16:9 frame)
+# rev2: figures fade as one layer (lib/bwlong.js layered()), no see-through parts during fades
 set -e; S=2026-11-04-short-sleepy-farm-friends; O=release/$S; mkdir -p $O
 python3 ep/bwd_farm_music.py $O/music.wav 45
 FADEIN=1 FADEOUT=1 DUR=45 T0=36 OW=2560 OH=1440 node ep/bwd_farm.js | ffmpeg -v error -y -f rawvideo -pix_fmt rgba -s 2560x1440 -r 30 -i - -i $O/music.wav -map 0:v -map 1:a -af "afade=out:st=41:d=4" -c:v libx264 -preset slow -tune animation -crf 12 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest $O/src.mp4

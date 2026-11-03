@@ -1,5 +1,6 @@
 #!/bin/bash
 # Daily B&W sensory #2 (90 min): Sleepy Farm – ep/bwd_farm.js (cow, pig, horse, hen, chick, goat, barn, tractor, duck, sleeping cat; stars, drifting clouds, fence + grass)
+# rev2: figures fade as one layer (lib/bwlong.js layered()), no see-through parts during fades
 # + ep/bwd_farm_music.py (guitar/musicbox/piano, forest birds, 4/4). Last 20 min slowly dimmer.
 set -e; S=2026-11-04-bw-sleepy-farm; O=release/$S; mkdir -p $O
 DIMLOOPS=5 tools/long.sh ep/bwd_farm.js "python3 ep/bwd_farm_music.py" $O 90
