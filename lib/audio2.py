@@ -401,3 +401,76 @@ def weather_long(dur, shift=0):
                     if ln >= 2 and not fin: tr.add(steelpan(f, .3), t0 + p*E + E, .1, .18)   # pan "roll" echo
                 p += ln
     return tr.buf
+
+# ---------- "homes" (episode en05): bouncy country/bluegrass in D, fiddle lead, banjo rolls, boom-chick bass + guitar, brush snare ----------
+HM_A = [[('F#5',2),('A5',2),('B5',1),('A5',1),('F#5',2)], [('G5',2),('B5',2),('D6',2),('B5',2)], [('A5',1),('B5',1),('A5',1),('F#5',1),('E5',2),('F#5',2)], [('D5',6),('-',2)],
+        [('F#5',2),('A5',2),('D6',2),('C#6',1),('B5',1)], [('B5',2),('G5',2),('E5',2),('G5',2)], [('F#5',1),('G5',1),('A5',2),('E5',2),('C#5',2)], [('D5',6),('-',2)]]
+HM_ACH = ['D','G','A','D','D','G','A','D']
+HM_B = [[('G5',3),('A5',1),('B5',2),('G5',2)], [('F#5',3),('G5',1),('A5',2),('F#5',2)], [('E5',2),('F#5',2),('G5',2),('B5',2)], [('A5',6),('-',2)],
+        [('G5',2),('B5',2),('D6',2),('B5',2)], [('A5',2),('F#5',2),('D5',2),('F#5',2)], [('E5',2),('A5',2),('G5',1),('F#5',1),('E5',2)], [('D5',6),('-',2)]]
+HM_BCH = ['G','D','Em','A','G','D','A','D']
+
+def fiddle(f, length):
+    n = int(length*SR); t = tt(n); a = np.minimum(t/.05, 1); r = np.ones(n); cut = max(1, int(n*.75)); r[cut:] = np.linspace(1, 0, n-cut)
+    vib = np.sin(2*np.pi*5.6*t) * .006 * np.minimum(t/.25, 1)
+    ph = 2*np.pi*f*np.cumsum(1 + vib)/SR
+    s = sum(np.sin(k*ph) * (1/k) * (1 if k < 4 else .6) for k in range(1, 9))
+    bow = band(rng.standard_normal(n), 2000, 7000) * .05 * (1 + np.exp(-t/.05))
+    return (s * .32 + bow) * a * r
+
+def banjo(f, length=.3):
+    n = int(length*SR); t = tt(n)
+    return sum(np.sin(2*np.pi*k*f*t) * np.exp(-t*(7 + k*5)) / k for k in range(1, 7)) * np.minimum(t/.001, 1) * .7
+
+def buzz(length=2.0):
+    n = int(length*SR); t = tt(n); f = 210 + 25*np.sin(2*np.pi*3*t) + 15*np.sin(2*np.pi*7.3*t)
+    s = band(osc(f, 'saw'), 150, 2500) * (.7 + .3*np.sin(2*np.pi*31*t))
+    return s * np.minimum(t/.15, 1) * np.clip((length - t)/.3, 0, 1) * .5
+def tweet():
+    out = np.zeros(int(.9*SR))
+    for d, f0, f1 in ((0, 2400, 3400), (.18, 2600, 3600), (.42, 3200, 2200)):
+        n = int(.13*SR); t = tt(n); s = osc(fcurve([(0, f0), (.13, f1)], n), 'sine') * np.sin(np.pi*t/.13) * (1 + .3*np.sin(2*np.pi*60*t))
+        i = int(d*SR); out[i:i+n] += s
+    return out * .55
+def blub():
+    out = np.zeros(int(.8*SR))
+    for d, f0 in ((0, 300), (.16, 420), (.34, 360)):
+        n = int(.12*SR); t = tt(n); s = osc(fcurve([(0, f0), (.12, f0*2.2)], n), 'sine') * np.exp(-t/.04)
+        i = int(d*SR); out[i:i+n] += s
+    return out * .7
+NAMED.update({'buzz': buzz, 'tweet': tweet, 'blub': blub})
+
+def homes_long(dur, shift=0):
+    BEAT = .45; BAR = 4*BEAT; E = BEAT/2
+    tr = Track(dur)
+    CH = {'D': ('D3', ['F#3','A3','D4']), 'G': ('G2', ['G3','B3','D4']), 'A': ('A2', ['E3','A3','C#4']), 'Em': ('E3', ['E3','G3','B3'])}
+    FIFTH = {'D': 'A2', 'G': 'D3', 'A': 'E3', 'Em': 'B2'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(HM_A, HM_ACH), (HM_B, HM_BCH), (HM_A, HM_ACH), (None, ['G','D','A','D','G','D','A','A'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'D'),(None,'A')] + body[:nb - 4] + [(HM_A[6], 'A'), ([('D5',8)], 'D')]
+    last = len(song) - 1
+    ROLL = [2, 1, 0, 2, 1, 0, 2, 1]     # forward roll over the chord tones (banjo, one octave up)
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in tri]; rf = freq(root, shift); ff = freq(FIFTH[ch], shift)
+        if not fin:
+            for b, f in enumerate([rf, None, ff, None]):
+                if f: tr.add(sine_bass(f, BEAT*.9), t0 + b*BEAT, 0, .6)
+            for b in (1, 3): tr.add(pluck(fr, .16), t0 + b*BEAT, -.3, .26)
+            for p in range(8): tr.add(banjo(fr[ROLL[p]]*2, .3), t0 + p*E, .35, .16 if p % 2 else .22)
+            if bi >= 2:
+                for b in (1, 3): tr.add(brush_hit(), t0 + b*BEAT, .15, .55)
+                for p in range(8): tr.add(shaker(), t0 + p*E, -.4, .14 if p % 2 else .2)
+        else:
+            tr.add(sine_bass(rf, BAR), t0, 0, .6); tr.add(pluck(fr, BAR), t0, -.3, .35); tr.add(banjo(fr[2]*2, BAR), t0, .35, .25)
+        if mel is None and not fin and bi >= 2:
+            for k, n in enumerate([tri[0], tri[1], tri[2], tri[1]]): tr.add(fiddle(freq(n, shift + 12), BEAT*.95), t0 + k*BEAT, .1, .22)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E + (1.4 if fin else .04)
+                    tr.add(fiddle(f, L), t0 + p*E, .1, .5)
+                p += ln
+    return tr.buf
