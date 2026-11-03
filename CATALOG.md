@@ -73,7 +73,7 @@ Holiday calendar for the daily task (make ~3 days ahead, gentle, never scary): N
 | Date | Title | Source | Posted |
 |---|---|---|---|
 | 2026-11-02 | Ocean Friends – B&W Baby Sensory #1 (whale, jellyfish, turtle, octopus, seahorse, crab, starfish, dolphin, pufferfish, striped fish; harp/celesta/cello + sea waves; last 20 min dimmer) | ep/bwd_ocean.js + ep/bwd_ocean_music.py | YT 2026-11-03 19:30 |
-| 2026-11-03 | Sleepy Farm – B&W Baby Sensory #2 (cow, pig, horse, hen, chick, goat, barn with sleepy window, tractor, duck, sleeping cat; stars, drifting clouds, fence + grass, sleepy moon outro; guitar/musicbox/piano + forest birds, 4/4; last 20 min dimmer) | ep/bwd_farm.js + ep/bwd_farm_music.py | YT 2026-11-04 19:30 |
+| 2026-11-03 | Sleepy Farm – B&W Baby Sensory #2 (cow, pig, horse, hen, chick, goat, barn with sleepy window, tractor, duck, sleeping cat; stars, drifting clouds, fence + grass, sleepy moon outro; guitar/musicbox/piano + forest birds, 4/4; last 20 min dimmer) | ep/bwd_farm.js + ep/bwd_farm_music.py | YT 2026-11-04 19:30 (rev2: lib/bwlong.js now fades each figure as one layer – no see-through legs/details during fades) |
 
 ## Instagram (@toet.friends, since 2026-11-02)
 - 2026-11-02 12:15 Reel: Who Is the Biggest? · 17:15 Reel: Birthday Cake!
