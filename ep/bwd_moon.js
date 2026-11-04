@@ -165,8 +165,9 @@ function bg(t) {
 }
 // outro: a sleeping star in a crescent-moon hammock
 function sleepyEnd(t) {
-  x.save(); x.beginPath(); x.arc(0, 40, 150, 0, 7); x.clip();
-  x.beginPath(); x.arc(0, 40, 150, 0, 7); x.arc(0, -20, 140, 0, 7); x.fillStyle = WH; x.fill('evenodd'); x.restore();
+  // crescent as one explicit outline (outer arc through the bottom, inner arc back) – no clip, so no hairline ring
+  const a1 = Math.atan2(-54.17, 139.9), b1 = Math.atan2(5.83, 139.9);
+  x.beginPath(); x.arc(0, 40, 150, a1, Math.PI - a1, false); x.arc(0, -20, 140, Math.PI - b1, b1, true); x.closePath(); x.fillStyle = WH; x.fill();
   x.save(); x.translate(0, 40 + per(t, 12) * 4); x.rotate(.2);
   starPath(0, 0, 70, 34); x.fillStyle = WH; x.fill(); x.lineJoin = 'round'; x.lineWidth = 14; x.strokeStyle = WH; x.stroke();
   sleepyEye(-16, -2, 8, 4); sleepyEye(14, -4, 8, 4); smile(-2, 14, 9, 4);
