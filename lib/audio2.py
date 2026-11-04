@@ -474,3 +474,76 @@ def homes_long(dur, shift=0):
                     tr.add(fiddle(f, L), t0 + p*E, .1, .5)
                 p += ln
     return tr.buf
+
+# ---------- "music" (episode en06): laid-back one-drop reggae in A, melodica lead, organ skank, round bass, rimshot ----------
+MU_A = [[('C#5',2),('E5',2),('A5',3),('G#5',1)], [('F#5',2),('A5',2),('F#5',2),('D5',2)], [('E5',1),('F#5',1),('G#5',2),('B5',2),('G#5',2)], [('A5',6),('-',2)],
+        [('C#6',2),('B5',1),('A5',1),('F#5',2),('A5',2)], [('A5',2),('F#5',1),('E5',1),('D5',4)], [('E5',2),('G#5',2),('B5',1),('A5',1),('G#5',2)], [('A5',6),('-',2)]]
+MU_ACH = ['A','D','E','A','F#m','D','E','A']
+MU_B = [[('F#5',3),('E5',1),('D5',2),('F#5',2)], [('E5',3),('C#5',1),('A4',4)], [('D5',2),('F#5',2),('B5',2),('A5',2)], [('G#5',6),('-',2)],
+        [('A5',2),('F#5',2),('D6',3),('C#6',1)], [('C#6',2),('A5',2),('E5',4)], [('B4',1),('C#5',1),('E5',2),('G#5',2),('B5',2)], [('A5',6),('-',2)]]
+MU_BCH = ['D','A','Bm','E','D','A','E','A']
+
+def melodica(f, length):
+    n = int(length*SR); t = tt(n); a = np.minimum(t/.04, 1); r = np.ones(n); cut = max(1, int(n*.8)); r[cut:] = np.linspace(1, 0, n-cut)
+    vib = np.sin(2*np.pi*5.2*t) * .003 * np.minimum(t/.4, 1)
+    ph = 2*np.pi*f*np.cumsum(1 + vib)/SR
+    s = sum(np.sin(k*ph) * (1/k) for k in (1, 3, 5, 7)) + .35*np.sin(2*ph)
+    return (s * .42 + band(rng.standard_normal(n), f, f*4) * .03) * a * r
+
+def organ(freqs, length=.22):
+    n = int(length*SR); t = tt(n); e = np.minimum(t/.004, 1) * np.exp(-t/.09)
+    return sum(np.sin(2*np.pi*f*t) + .5*np.sin(4*np.pi*f*t) + .25*np.sin(6*np.pi*f*t) for f in freqs) * e / len(freqs) * .7
+
+def rimshot():
+    n = int(.12*SR); t = tt(n)
+    return (np.sin(2*np.pi*1700*t) * .5 + band(rng.standard_normal(n), 2000, 8000)) * np.exp(-t/.02) * .55
+
+def drum_boom(pitch=1.0):
+    n = int(.6*SR); t = tt(n); f = (95 + 70*np.exp(-t/.03)) * pitch
+    return (np.sin(2*np.pi*np.cumsum(f)/SR) * np.exp(-t/.22) + band(rng.standard_normal(n), 300, 3000) * np.exp(-t/.02) * .35) * .95
+def maraca():
+    out = np.zeros(int(.4*SR))
+    for d, g in ((0, 1), (.11, .7), (.2, .9)):
+        n = int(.09*SR); tt_ = tt(n); s = band(rng.standard_normal(n), 3500, 12000) * np.minimum(tt_/.01, 1) * np.exp(-tt_/.035)
+        i = int(d*SR); out[i:i+n] += s * g
+    return out * .8
+def xylo_note(note='C5'):
+    return xylo(freq(note), .5) * .8
+def toot(length=1.0):
+    n = int(length*SR); t = tt(n); f = 330 * (1 + .02*np.sin(2*np.pi*6*t))
+    ph = 2*np.pi*np.cumsum(f)/SR
+    s = sum(np.sin(k*ph) * (1/k**.8) for k in range(1, 9))
+    return s * np.minimum(t/.03, 1) * np.clip((length - t)/.15, 0, 1) * .32
+NAMED.update({'drum': drum_boom, 'maraca': maraca, 'xylo': xylo_note, 'toot': toot})
+
+def music_long(dur, shift=0):
+    BEAT = .6; BAR = 4*BEAT; E = BEAT/2
+    tr = Track(dur)
+    CH = {'A': ('A2', ['A3','C#4','E4']), 'D': ('D3', ['A3','D4','F#4']), 'E': ('E2', ['G#3','B3','E4']),
+          'F#m': ('F#2', ['A3','C#4','F#4']), 'Bm': ('B2', ['B3','D4','F#4'])}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(MU_A, MU_ACH), (MU_B, MU_BCH), (MU_A, MU_ACH), (None, ['D','E','A','F#m','D','E','A','A'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'A'),(None,'E')] + body[:nb - 4] + [(MU_A[6], 'E'), ([('A5',8)], 'A')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in tri]; rf = freq(root, shift)
+        if not fin:
+            for p, m, L in [(0, 1, 2.6), (3, 1, .9), (4, 1.5, 1.6), (6, 2, .9), (7, 1.5, .9)]: tr.add(sine_bass(rf*m, E*L), t0 + p*E, 0, .6)
+            for b in range(4): tr.add(organ(fr), t0 + b*BEAT + E, -.3, .3)           # skank on the off-beats
+            if bi >= 2:
+                tr.add(kick(), t0 + 2*BEAT, 0, .6); tr.add(rimshot(), t0 + 2*BEAT, .15, .4)   # one-drop
+                for p in range(8): tr.add(hat(), t0 + p*E + (.03 if p % 2 else 0), .4, .28 if p % 2 else .18)
+        else:
+            tr.add(sine_bass(rf, BAR), t0, 0, .6); tr.add(organ(fr, BAR), t0, -.3, .35)
+        if mel is None and not fin and bi >= 2:
+            for k, n in enumerate([tri[0], tri[2], tri[1], tri[2]]): tr.add(marimba(freq(n, shift + 12), .4), t0 + k*BEAT + E, .3, .18)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E + (1.4 if fin else .05)
+                    tr.add(melodica(f, L), t0 + p*E, .1, .42)
+                p += ln
+    return tr.buf

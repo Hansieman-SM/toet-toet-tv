@@ -7,7 +7,7 @@ Title pattern: "<Theme> 🖤🤍 Black & White Baby Sensory | High Contrast for 
 |---|---|---|---|---|
 | 1 | Ocean Friends | whale, jellyfish, turtle, octopus, seahorse, crab, starfish, dolphin, pufferfish, striped fish | harp, celesta, cello / sea | 2026-11-03 bw-ocean-friends |
 | 2 | Sleepy Farm | cow, pig, horse, hen, chick, goat, barn, tractor, duck, cat | guitar, musicbox, piano / forest | 2026-11-04 bw-sleepy-farm |
-| 3 | Moon and Stars | moon, stars, comet, planet, rocket, owl, cloud, sleepy sun, constellation, lantern | celesta, vibes, flute / night | |
+| 3 | Moon and Stars | moon, stars, comet, planet, rocket, owl, cloud, sleepy sun, constellation, lantern | celesta, vibes, flute / night | 2026-11-05 bw-moon-and-stars |
 | 4 | Aquarium | angelfish, goldfish, snail, castle, bubbles diver, shrimp, guppy, plant, clam, ray | kalimba, harp, vibes / sea | |
 | 5 | Safari Babies | lion cub, baby elephant, giraffe, zebra, hippo, monkey, rhino calf, flamingo, meerkat, tortoise | marimba-like kalimba, guitar, cello / wind | |
 | 6 | Forest Friends | owl, fox, hedgehog, deer, squirrel, mushroom, bear, rabbit, acorn, tree | flute, harp, piano / forest | |
