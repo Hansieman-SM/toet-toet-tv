@@ -21,6 +21,7 @@
 | 2026-11-04 | Story ep (2:34) | Let's Make Music! – The Big Four find instruments: Leo drum (boom 1-2-3 + drum roll), Nico maracas (fast & slow), Boris xylophone (low → high, rainbow bars), Ella has no instrument and feels sad → friends: her trunk is a trumpet! TOOT → happy; band plays together on the beat, recap Drum/Maracas/Xylophone/Trumpet. New one-drop reggae music (music_long: melodica, organ skank, round bass, rimshot) + instrument sfx (drum/maraca/xylo/toot). YT 2026-11-05 16:00 | EN | ep/en06_music.js |
 | 2026-10-26 | 90 min | Under the Sea – calm ocean animals (whale, dolphins, shark, manta, turtle, jellyfish, seahorse, clownfish, octopus, crab) | EN | ep/ocean.js |
 | 2026-11-02 | 90 min | Snowy Northern Lights – polar bear mama + cub with snowball, penguin family waddling, seal on ice floe, beluga hello, sleeping arctic fox, snowy owl, sliding baby penguin, arctic hare, snowman, igloo, sleepy crescent moon, pastel aurora, falling snow. New music: felt piano, glass-harmonica pad, FM electric piano, snowflake tinkles, bowed bass, airy wind (4/4, 56 bpm, E♭). YT 2026-11-03 18:30 | EN | ep/arctic.js + ep/arctic_music.py |
+| 2026-11-05 | 90 min | Balloon Ride – striped hot-air balloons drift over pastel hills with waving passengers (bunny, bear cub, piglet, kitten), smiling sun, sleepy clouds, turning windmill, geese, pond with mama duck + duckling, grazing sheep + hopping lamb, hedgehog, butterflies, dandelion seeds. New music: clarinet melody, pizzicato strings, harmonium pad, glockenspiel sparkles, summer breeze + far-away songbird (lilting 6/8, F major). YT 2026-11-06 18:30 | EN | ep/balloons.js + ep/balloons_music.py |
 
 ## Shorts (English)
 | Date made | Title | Source | Scheduled |
@@ -44,9 +45,11 @@
 | 2026-11-03 | Sleepy Farm – Black & white for babies (goat, duck, sleeping cat, moon) | ep/bwd_farm.js T0=36, 45 s | YT 2026-11-04 17:00 · Instagram 17:15 · TikTok 17:30 |
 | 2026-11-04 | Ella's Trumpet – Toot! Let's play together! | ep/en06_music.js 90–137 s | YT 2026-11-05 12:00 · Instagram 12:15 · TikTok 12:30 |
 | 2026-11-04 | Moon and Stars – Black & white for babies (moon, heart constellation, star, crescent outro) | ep/bwd_moon.js T0=108, 45 s | YT 2026-11-05 17:00 · Instagram 17:15 · TikTok 17:30 |
+| 2026-11-05 | Up, Up and Away! – Wave hello to the balloons! (bunny + bear cub balloons) | ep/balloons.js T0=40, 45 s | YT 2026-11-06 12:00 · Instagram 12:15 · TikTok 12:30 |
+| 2026-11-05 | Aquarium Friends – Black & white for babies (ray, castle with peeking fish, diver helmet, sleepy goldfish outro) | ep/bwd_aquarium.js T0=60, 45 s | YT 2026-11-06 17:00 · Instagram 17:15 · TikTok 17:30 |
 
 ## Theme ideas not used yet
-rain forest at dusk, night farm, space & planets with friendly astronaut animals, savanna sunset (Big Four sleeping), rainy window & cozy room, hot-air balloons over hills, aquarium/koi pond, butterflies & flower garden, bedtime train journey with Toet (night countryside).
+rain forest at dusk, night farm, space & planets with friendly astronaut animals, savanna sunset (Big Four sleeping), rainy window & cozy room, koi pond, butterflies & flower garden, bedtime train journey with Toet (night countryside).
 
 ## TikTok (@toet.friends)
 - 2026-10-28 12:30 Shape Hunt · 17:30 Sleepy Elephant · 19:30 Under the Sea
@@ -58,6 +61,7 @@ rain forest at dusk, night farm, space & planets with friendly astronaut animals
 - 2026-11-03 12:30 Snowy Friends · 17:30 Wheee, Downhill!
 - 2026-11-04 12:30 Who Lives Here? · 17:30 Sleepy Farm
 - 2026-11-05 12:30 Ella's Trumpet · 17:30 Moon and Stars
+- 2026-11-06 12:30 Up, Up and Away! · 17:30 Aquarium Friends
 
 ## English remakes of the Dutch videos (2026-10-28, jobs/en-remake-*.sh, scripts *_en.js via tools/make_en.py + en/translations.json)
 Little Truck Toet · The Big Four · Toet Counts Cows · Toet and the Colors · Toet Charges Up · Who Makes This Sound? · Peekaboo! · Who Is the Biggest? · Fun at the Playground · Visiting Grandpa and Grandma · Toet on Safari · Toet Climbs the Mountain · Toet and Bus Bas · Toet at the Car Wash · Toet Delivers the Cake · Toet Has a Flat Tire · Toet in the Rain · Toet Looks for Mama Duck · Good Night, Toet
@@ -79,8 +83,10 @@ Holiday calendar for the daily task (make ~3 days ahead, gentle, never scary): N
 | 2026-11-02 | Ocean Friends – B&W Baby Sensory #1 (whale, jellyfish, turtle, octopus, seahorse, crab, starfish, dolphin, pufferfish, striped fish; harp/celesta/cello + sea waves; last 20 min dimmer) | ep/bwd_ocean.js + ep/bwd_ocean_music.py | YT 2026-11-03 19:30 |
 | 2026-11-03 | Sleepy Farm – B&W Baby Sensory #2 (cow, pig, horse, hen, chick, goat, barn with sleepy window, tractor, duck, sleeping cat; stars, drifting clouds, fence + grass, sleepy moon outro; guitar/musicbox/piano + forest birds, 4/4; last 20 min dimmer) | ep/bwd_farm.js + ep/bwd_farm_music.py | YT 2026-11-04 19:30 (rev2: lib/bwlong.js now fades each figure as one layer – no see-through legs/details during fades) |
 | 2026-11-04 | Moon and Stars – B&W Baby Sensory #3 (smiling full moon, star, comet, ringed planet, rocket, owl on branch, sleepy cloud, sleepy sun in nightcap, heart constellation, paper lantern; star field, slow shooting star, white hills; outro sleeping star in crescent moon; celesta/vibes/flute + night crickets, 3/4; last 20 min dimmer) | ep/bwd_moon.js + ep/bwd_moon_music.py | YT 2026-11-05 19:30 |
+| 2026-11-05 | Aquarium – B&W Baby Sensory #4 (angelfish, fancy goldfish, snail, castle with peeking fish, toy diver helmet, shrimp, guppy family, smiling water plant, clam with pearl, ray; water surface, air-stone bubbles, pebbles, tank plants; outro sleepy goldfish; kalimba/harp/vibes + sea hush, 4/4; last 20 min dimmer) | ep/bwd_aquarium.js + ep/bwd_aquarium_music.py | YT 2026-11-06 19:30 |
 
 ## Instagram (@toet.friends, since 2026-11-02)
 - 2026-11-02 12:15 Reel: Who Is the Biggest? · 17:15 Reel: Birthday Cake!
 - 2026-11-04 12:15 Reel: Who Lives Here? · 17:15 Reel: Sleepy Farm
 - 2026-11-05 12:15 Reel: Ella's Trumpet · 17:15 Reel: Moon and Stars
+- 2026-11-06 12:15 Reel: Up, Up and Away! · 17:15 Reel: Aquarium Friends
