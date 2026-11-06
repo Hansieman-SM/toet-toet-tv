@@ -547,3 +547,88 @@ def music_long(dur, shift=0):
                     tr.add(melodica(f, L), t0 + p*E, .1, .42)
                 p += ln
     return tr.buf
+
+# ---------- "hide" (episode en07): light bossa nova in F, ocarina lead, nylon-guitar comping, root-fifth bass, clave + shaker ----------
+HS_A = [[('A5',3),('G5',1),('F5',2),('C5',2)], [('D5',2),('F5',2),('A5',3),('G5',1)], [('G5',2),('E5',1),('F5',1),('G5',2),('C6',2)], [('A5',6),('-',2)],
+        [('C6',3),('A#5',1),('A5',2),('F5',2)], [('G5',2),('A#5',2),('D6',3),('C6',1)], [('A#5',2),('G5',2),('E5',2),('G5',2)], [('F5',6),('-',2)]]
+HS_ACH = ['F','Dm','C7','F','F','Gm','C7','F']
+HS_B = [[('D6',2),('C6',1),('A#5',1),('A5',4)], [('A#5',2),('A5',1),('G5',1),('F5',4)], [('E5',2),('G5',2),('A#5',2),('D6',2)], [('C6',6),('-',2)],
+        [('A5',2),('C6',2),('F6',3),('E6',1)], [('D6',2),('A#5',2),('G5',4)], [('A5',1),('G5',1),('F5',2),('E5',2),('G5',2)], [('F5',6),('-',2)]]
+HS_BCH = ['Gm','F','C7','F','Dm','Gm','C7','F']
+
+def ocarina(f, length):
+    n = int(length*SR); t = tt(n); a = np.minimum(t/.06, 1); r = np.ones(n); cut = max(1, int(n*.7)); r[cut:] = np.linspace(1, 0, n-cut)
+    vib = np.sin(2*np.pi*4.8*t) * .005 * np.clip((t - .2)/.3, 0, 1)
+    ph = 2*np.pi*f*np.cumsum(1 + vib)/SR
+    s = np.sin(ph) + .12*np.sin(3*ph) + .05*np.sin(2*ph)
+    breath = band(rng.standard_normal(n), f*.8, f*3) * .06 * (1 + 2*np.exp(-t/.05))
+    return (s * .55 + breath) * a * r
+
+def nylon(freqs, length=.5):
+    n = int(length*SR); out = np.zeros(n)
+    for i, f in enumerate(freqs):        # soft strum: each string 12 ms later
+        d = int(i*.012*SR); m = n - d
+        if m <= 0: continue
+        t = tt(m)
+        out[d:] += sum(np.sin(2*np.pi*k*f*t) * np.exp(-t*(3 + k*3)) / k**1.3 for k in range(1, 6)) * np.minimum(t/.004, 1)
+    t = tt(n)
+    return out / len(freqs) * np.clip((length - t)/.06, 0, 1) * .8
+
+def clave():
+    n = int(.15*SR); t = tt(n)
+    return (np.sin(2*np.pi*2500*t) * .8 + np.sin(2*np.pi*3900*t) * .25) * np.exp(-t/.018) * .5
+
+def meow(pitch=1.0):
+    n = int(.75*SR); t = tt(n); f = fcurve([(0, 520), (.18, 820), (.5, 700), (.75, 430)], n) * pitch
+    s = band(osc(f, 'saw'), 500, 3500) * (.75 + .25*np.sin(2*np.pi*6*t))
+    wah = .5 + .5*np.sin(np.pi*np.clip(t/.75, 0, 1))
+    return s * wah * np.minimum(t/.05, 1) * np.clip((.75 - t)/.2, 0, 1) * .55
+
+def purr(length=1.6):
+    n = int(length*SR); t = tt(n)
+    s = band(rng.standard_normal(n), 60, 500) * (.5 + .5*np.sin(2*np.pi*24*t)) * (.6 + .4*np.sin(2*np.pi*1.2*t))
+    return s * np.minimum(t/.2, 1) * np.clip((length - t)/.3, 0, 1) * .9
+
+def tiptoe():
+    out = np.zeros(int(.9*SR))
+    for d, note in ((0, 'E6'), (.22, 'G6'), (.44, 'E6'), (.66, 'C6')):
+        s = pluck([freq(note)], .2) * .5; i = int(d*SR); out[i:i+len(s)] += s
+    return out
+NAMED.update({'meow': meow, 'purr': purr, 'tiptoe': tiptoe, 'clave': clave})
+
+def hide_long(dur, shift=0):
+    BEAT = .5; BAR = 4*BEAT; E = BEAT/2
+    tr = Track(dur)
+    CH = {'F': ('F2', ['A3','C4','F4','A4']), 'Dm': ('D3', ['A3','D4','F4','A4']), 'Gm': ('G2', ['A#3','D4','G4','A#4']),
+          'C7': ('C3', ['A#3','E4','G4','C5'])}
+    FIFTH = {'F': 'C3', 'Dm': 'A2', 'Gm': 'D3', 'C7': 'G2'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(HS_A, HS_ACH), (HS_B, HS_BCH), (HS_A, HS_ACH), (None, ['Dm','Gm','C7','F','Dm','Gm','C7','C7'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'F'),(None,'C7')] + body[:nb - 4] + [(HS_A[6], 'C7'), ([('F5',8)], 'F')]
+    last = len(song) - 1
+    COMP = [0, 3, 6, 10, 13]          # bossa guitar stabs on a 16-step (8th-note, 2 bars feel squeezed into one) grid
+    CLAVE = [0, 3, 6, 10, 12]
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch4 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch4]; rf = freq(root, shift); ff = freq(FIFTH[ch], shift)
+        S16 = BAR/16
+        if not fin:
+            for b, f in ((0, rf), (6, ff), (8, rf), (14, ff)): tr.add(sine_bass(f, S16*5), t0 + b*S16, 0, .55)
+            for p in COMP: tr.add(nylon(fr, S16*2.6), t0 + p*S16, -.3, .3)
+            if bi >= 2:
+                for p in CLAVE: tr.add(clave(), t0 + p*S16, .35, .22)
+                for p in range(16): tr.add(shaker(), t0 + p*S16, -.45, .13 if p % 2 else .19)
+                tr.add(kick(), t0, 0, .25); tr.add(kick(), t0 + 8*S16, 0, .2)
+        else:
+            tr.add(sine_bass(rf, BAR), t0, 0, .6); tr.add(nylon(fr, BAR), t0, -.3, .4)
+        if mel is None and not fin and bi >= 2:
+            for k, n in enumerate([ch4[3], ch4[2], ch4[1], ch4[2]]): tr.add(glock(freq(n, shift), .5), t0 + k*BEAT + E, .3, .1)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E + (1.4 if fin else .05)
+                    tr.add(ocarina(f, L), t0 + p*E, .1, .48)
+                p += ln
+    return tr.buf
