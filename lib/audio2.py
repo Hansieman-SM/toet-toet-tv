@@ -632,3 +632,79 @@ def hide_long(dur, shift=0):
                     tr.add(ocarina(f, L), t0 + p*E, .1, .48)
                 p += ln
     return tr.buf
+
+# ---------- "fruit picnic" (episode en08): gentle Celtic-style jig in D, 6/8 – tin whistle lead, musette accordion, bodhran, plucked bouzouki ----------
+JG_A = [[('D5',2),('F#5',1),('A5',2),('F#5',1)], [('G5',2),('B5',1),('A5',2),('F#5',1)], [('E5',1),('F#5',1),('G5',1),('A5',2),('E5',1)], [('F#5',3),('D5',3)],
+        [('D5',2),('F#5',1),('A5',2),('D6',1)], [('B5',2),('G5',1),('A5',2),('F#5',1)], [('E5',1),('G5',1),('F#5',1),('E5',2),('C#5',1)], [('D5',6)]]
+JG_ACH = ['D','G','A','D','D','G','A','D']
+JG_B = [[('A5',2),('B5',1),('A5',1),('G5',1),('F#5',1)], [('G5',2),('E5',1),('B4',3)], [('A5',2),('B5',1),('C#6',2),('A5',1)], [('D6',3),('A5',3)],
+        [('B5',2),('A5',1),('G5',2),('B5',1)], [('A5',2),('F#5',1),('D5',3)], [('E5',1),('F#5',1),('G5',1),('A5',1),('B5',1),('C#6',1)], [('D6',3),('-',3)]]
+JG_BCH = ['D','Em','A','D','G','D','A','D']
+
+def whistle_tin(f, length):
+    n = int(length*SR); t = tt(n); a = np.minimum(t/.025, 1); r = np.ones(n); cut = max(1, int(n*.75)); r[cut:] = np.linspace(1, 0, n-cut)
+    bend = 1 - .02*np.exp(-t/.03)                       # tiny 'cut' into the note
+    vib = np.sin(2*np.pi*5.6*t) * .004 * np.clip((t - .25)/.3, 0, 1)
+    ph = 2*np.pi*f*np.cumsum(bend + vib)/SR
+    s = np.sin(ph) + .18*np.sin(2*ph) + .06*np.sin(3*ph)
+    breath = band(rng.standard_normal(n), f*1.2, f*4) * .05 * (1 + 3*np.exp(-t/.03))
+    return (s * .5 + breath) * a * r
+
+def musette(freqs, length):
+    n = int(length*SR); t = tt(n); e = np.minimum(t/.03, 1) * np.clip((length - t)/.08, 0, 1)
+    out = np.zeros(n)
+    for f in freqs:
+        for det in (1.0, 1.006):                          # two reeds slightly apart = wobbly accordion sound
+            ph = 2*np.pi*f*det*t
+            out += np.sin(ph) + .45*np.sin(2*ph) + .25*np.sin(3*ph) + .1*np.sin(5*ph)
+    return out * e / (2*len(freqs)) * .5
+
+def bodhran(accent=False):
+    n = int(.25*SR); t = tt(n); f = (80 if accent else 120) + 50*np.exp(-t/.02)
+    return (np.sin(2*np.pi*np.cumsum(f)/SR) * np.exp(-t/(.12 if accent else .06)) + band(rng.standard_normal(n), 200, 1800) * np.exp(-t/.015) * .3) * (.9 if accent else .45)
+
+def munch():
+    out = np.zeros(int(1.1*SR))
+    for k in range(4):
+        m = int(.09*SR); t = tt(m); s = band(rng.standard_normal(m), 900, 5000) * np.exp(-t/.025)
+        s += np.sin(2*np.pi*160*t) * np.exp(-t/.03) * .4
+        i = int(k*.25*SR); out[i:i+m] += s * (.9 - k*.1)
+    return out * .6
+
+def crack():
+    n = int(.6*SR); t = tt(n)
+    s = band(rng.standard_normal(n), 400, 6000) * np.exp(-t/.05) + np.sin(2*np.pi*np.cumsum(140 + 80*np.exp(-t/.02))/SR) * np.exp(-t/.15) * .7
+    return s * .8
+NAMED.update({'munch': munch, 'crack': crack})
+
+def picnic_long(dur, shift=0):
+    E = .175; BAR = 6*E
+    tr = Track(dur)
+    CH = {'D': ('D3', ['D4','F#4','A4']), 'G': ('G2', ['G3','B3','D4']), 'A': ('A2', ['A3','C#4','E4']), 'Em': ('E3', ['E3','G3','B3'])}
+    FIFTH = {'D': 'A2', 'G': 'D3', 'A': 'E3', 'Em': 'B2'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(JG_A, JG_ACH), (JG_B, JG_BCH), (JG_A, JG_ACH), (None, ['G','D','A','D','G','D','Em','A'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'D'),(None,'A')] + body[:nb - 4] + [(JG_A[6], 'A'), ([('D5',6)], 'D')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch3 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch3]; rf = freq(root, shift); ff = freq(FIFTH[ch], shift)
+        if not fin:
+            tr.add(tri_bass(rf, 2*E), t0, 0, .5); tr.add(tri_bass(ff, 2*E), t0 + 3*E, 0, .45)
+            for p in (1, 2, 4, 5): tr.add(musette(fr, E*.85), t0 + p*E, -.25, .22 if p in (1, 4) else .16)
+            if bi >= 2:
+                for p in range(6): tr.add(bodhran(p in (0, 3)), t0 + p*E, .2, .35 if p in (0, 3) else .2)
+        else:
+            tr.add(tri_bass(rf, BAR), t0, 0, .55); tr.add(musette(fr, BAR*1.4), t0, -.25, .3)
+        if mel is None and not fin and bi >= 2:      # quieter bars: bouzouki arpeggio instead of the whistle
+            for k, n in enumerate([ch3[0], ch3[1], ch3[2], ch3[1], ch3[2], ch3[1]]):
+                tr.add(pluck([freq(n, shift)*2], .4), t0 + k*E, .35, .16)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E + (1.2 if fin else .03)
+                    tr.add(whistle_tin(f, L), t0 + p*E, .1, .42)
+                p += ln
+    return tr.buf

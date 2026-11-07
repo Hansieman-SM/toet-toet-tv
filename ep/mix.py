@@ -15,6 +15,7 @@ elif kind == 'weather': music = weather_long(dur, m.get('shift', 0))
 elif kind == 'homes': music = homes_long(dur, m.get('shift', 0))
 elif kind == 'music': music = music_long(dur, m.get('shift', 0))
 elif kind == 'hide': music = hide_long(dur, m.get('shift', 0))
+elif kind == 'picnic': music = picnic_long(dur, m.get('shift', 0))
 else: music = lullaby(dur)
 events = [(t, make(name), g, pan) for t, name, g, pan in info['events']]
 duck = [tuple(d) for d in info['duck']]
