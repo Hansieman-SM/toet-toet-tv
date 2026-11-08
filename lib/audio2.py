@@ -708,3 +708,65 @@ def picnic_long(dur, shift=0):
                     tr.add(whistle_tin(f, L), t0 + p*E, .1, .42)
                 p += ln
     return tr.buf
+
+# ---------- "10 falling leaves" (learning series, counting 1): light autumn walk in A, 4/4 ~100 bpm – soft recorder lead, harpsichord-like pluck, pizzicato bass, tambourine ----------
+LV_A = [[('E5',2),('C#5',1),('E5',1),('A5',3),('-',1)], [('F#5',2),('E5',1),('D5',1),('C#5',2),('B4',2)], [('C#5',1),('D5',1),('E5',2),('F#5',1),('E5',1),('C#5',2)], [('B4',6),('-',2)],
+        [('E5',2),('C#5',1),('E5',1),('A5',2),('B5',2)], [('C#6',2),('B5',1),('A5',1),('F#5',4)], [('E5',1),('F#5',1),('E5',1),('D5',1),('C#5',2),('B4',2)], [('A4',6),('-',2)]]
+LV_ACH = ['A','D','A','E','A','F#m','E','A']
+LV_B = [[('D5',2),('F#5',2),('A5',3),('-',1)], [('G#5',2),('E5',2),('B4',4)], [('C#5',2),('E5',2),('A5',2),('G#5',1),('F#5',1)], [('E5',6),('-',2)],
+        [('D5',1),('E5',1),('F#5',2),('A5',2),('F#5',2)], [('E5',1),('C#5',1),('A4',2),('C#5',4)], [('B4',1),('C#5',1),('D5',1),('E5',1),('F#5',2),('G#5',2)], [('A5',6),('-',2)]]
+LV_BCH = ['D','E','A','E','D','A','E','A']
+
+def recorder(f, length):
+    n = int(length*SR); t = tt(n); a = np.minimum(t/.04, 1); r = np.ones(n); cut = max(1, int(n*.8)); r[cut:] = np.linspace(1, 0, n-cut)
+    vib = np.sin(2*np.pi*5.0*t) * .003 * np.clip((t - .3)/.3, 0, 1)
+    ph = 2*np.pi*f*np.cumsum(1 + vib)/SR
+    s = np.sin(ph) + .08*np.sin(2*ph) + .12*np.sin(3*ph)      # soft, slightly hollow (odd harmonic) recorder tone
+    breath = band(rng.standard_normal(n), f, f*3) * .04 * (1 + 2*np.exp(-t/.04))
+    return (s * .5 + breath) * a * r
+
+def harpsi(freqs, length=.5):
+    n = int(length*SR); t = tt(n); out = np.zeros(n)
+    for f in freqs:
+        out += sum(np.sin(2*np.pi*k*f*t) * np.exp(-t*(2 + k*1.4)) / k**.8 for k in range(1, 9))
+    return out * np.minimum(t/.002, 1) / (3*len(freqs)) * .6
+
+def pizz(f, length=.4):
+    n = int(length*SR); t = tt(n)
+    return (np.sin(2*np.pi*f*t) + .3*np.sin(4*np.pi*f*t)*np.exp(-t/.05)) * np.exp(-t/.18) * np.minimum(t/.003, 1)
+
+def tambourine():
+    n = int(.22*SR); t = tt(n)
+    return band(rng.standard_normal(n), 5000, 11000) * np.exp(-t/.06) * .5 + band(rng.standard_normal(n), 2500, 6000) * np.exp(-t/.02) * .2
+
+def leaves_long(dur, shift=0):
+    BEAT = .6; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'A': ('A2', ['A3','C#4','E4']), 'D': ('D3', ['D4','F#4','A4']), 'E': ('E2', ['E3','G#3','B3']), 'F#m': ('F#2', ['F#3','A3','C#4'])}
+    FIFTH = {'A': 'E3', 'D': 'A2', 'E': 'B2', 'F#m': 'C#3'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(LV_A, LV_ACH), (LV_B, LV_BCH), (LV_A, LV_ACH), (None, ['D','A','E','A','D','A','E','E'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'A'),(None,'E')] + body[:nb - 4] + [(LV_A[6], 'E'), ([('A5',8)], 'A')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch3 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch3]; rf = freq(root, shift); ff = freq(FIFTH[ch], shift)
+        if not fin:
+            for b, f in ((0, rf), (1, ff), (2, rf), (3, ff)): tr.add(pizz(f), t0 + b*BEAT, 0, .5)
+            for b in (0, 1, 2, 3): tr.add(harpsi(fr, .45), t0 + b*BEAT + E, -.3, .2)
+            if bi >= 2:
+                for b in (1, 3): tr.add(tambourine(), t0 + b*BEAT, .35, .3)
+                tr.add(tambourine(), t0 + 3*BEAT + E, .35, .15)
+        else:
+            tr.add(pizz(rf, 1.2), t0, 0, .55); tr.add(harpsi(fr, 1.6), t0, -.3, .3)
+        if mel is None and not fin and bi >= 2:
+            for k, n in enumerate([ch3[0], ch3[2], ch3[1], ch3[2]]): tr.add(glock(freq(n, shift)*2, .5), t0 + k*BEAT, .3, .1)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E + (1.2 if fin else .04)
+                    tr.add(recorder(f, L), t0 + p*E, .1, .42)
+                p += ln
+    return tr.buf
