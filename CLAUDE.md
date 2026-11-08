@@ -34,6 +34,11 @@ Owner: Hans (speaks Dutch – talk to him in Dutch). Channel: https://www.youtub
 7. **Check failures:** at the start of every run, call getScheduledPosts for the past 2 days (extendedRange) and look for providers with status ERROR. Fix the cause if possible and reschedule those posts (updateScheduledPost with a new time later today, at least 15 min ahead); tell Hans which posts failed and when they now go out.
 8. Add every item to CATALOG.md (date, title, Metricool post times for YouTube and TikTok).
 
+## Growth, trend scan and approval gate (Hans, 2026-11-08)
+- The channel must grow, but in a considered way. **New formats/series are only built and launched after Hans's explicit approval.** Proposals and their status live in IDEAS.md.
+- Every daily run: briefly scan what is popular on YouTube for ages 0–6 (web search: trending kids channels/formats, seasonal topics) and, if there is something new, add at most 1–2 proposals to IDEAS.md (status `proposed`) as a variant that fits our channel (own characters, own music, no copies). Mention them in the Dutch summary to Hans as a question ("Akkoord?"). Never repeat a proposal that is already in IDEAS.md.
+- Only items with status `approved` in IDEAS.md may be built/scheduled. The counting 1–10 and ABC series (storyboards 2026-11-08, sb/learn_storyboard.js) are `proposed` until Hans approves them.
+
 ## Daily batch (scheduled task, every day 07:31 Europe/Amsterdam)
 - Mon + Thu: 1 new 90-min calm video (new theme) + thumbnail.
 - Tue, Wed, Fri, Sat: 1 new English story episode (2–3 min) with Little Truck Toet or The Big Four + thumbnail.
