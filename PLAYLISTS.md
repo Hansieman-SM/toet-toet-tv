@@ -1,5 +1,4 @@
-# YouTube playlists (Hans creates/updates them in YouTube Studio – Metricool cannot manage playlists)
-Every new video belongs in exactly one main playlist (Shorts are added by YouTube automatically). The daily summary to Hans names the playlist for each new long-form video.
+# YouTube playlists – sorted AUTOMATICALLY every night by .github/workflows/playlists.yml (tools/yt_playlists.py, rules in tools/playlists.json, matched on the title). Needs one-time secrets YT_CLIENT_ID / YT_CLIENT_SECRET / YT_REFRESH_TOKEN; after that Hans does nothing.
 
 | Playlist (English, as on YouTube) | What goes in | Videos so far |
 |---|---|---|

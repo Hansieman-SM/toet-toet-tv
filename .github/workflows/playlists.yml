@@ -1,0 +1,17 @@
+name: Sort videos into playlists
+on:
+  schedule:
+    - cron: '23 21 * * *'
+  workflow_dispatch:
+jobs:
+  playlists:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sort new videos into YouTube playlists
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: python3 tools/yt_playlists.py

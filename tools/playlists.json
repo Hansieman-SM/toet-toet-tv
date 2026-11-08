@@ -1,0 +1,64 @@
+{
+ "_doc": "Automatic YouTube playlist sorting (tools/yt_playlists.py, daily via .github/workflows/playlists.yml). First matching rule wins. Shorts (#shorts) are skipped. Match = all 'all' words and at least one 'any' word (case-insensitive) in the title, and none of 'not'.",
+ "playlists": [
+  {
+   "title": "Black & White Baby Sensory (90 min)",
+   "description": "High-contrast black & white sensory videos for newborns and babies, 90 minutes of calm original music. All music and animation is original.",
+   "any": [
+    "black & white baby sensory"
+   ]
+  },
+  {
+   "title": "Calm Videos for Babies & Toddlers (90 min)",
+   "description": "Long, calm videos with gentle animals and soft original music – for quiet time, tummy time and bedtime. All music and animation is original.",
+   "any": [
+    "90 min"
+   ]
+  },
+  {
+   "title": "Learn to Count 1–10 with Toet & Friends",
+   "description": "Count from 1 to 10 with Little Truck Toet and The Big Four – calm counting videos for toddlers. All music and animation is original.",
+   "any": [
+    "count to 10",
+    "count 1 to 10",
+    "counting for toddlers"
+   ]
+  },
+  {
+   "title": "ABC – Learn the Alphabet",
+   "description": "Learn the alphabet A to Z with Little Truck Toet and The Big Four. All music and animation is original.",
+   "any": [
+    "abc",
+    "alphabet"
+   ]
+  },
+  {
+   "title": "Can You Find It? – Colours, Shapes & More",
+   "description": "Slow, playful find-it videos about colours, shapes and more. All music and animation is original.",
+   "any": [
+    "can you find it"
+   ]
+  },
+  {
+   "title": "The Big Four – Stories",
+   "description": "Story episodes with Leo the Lion, Ella the Elephant, Nico the Rhino and Boris the Buffalo. All music and animation is original.",
+   "any": [
+    "big four",
+    "leo the lion",
+    "ella the elephant"
+   ]
+  },
+  {
+   "title": "Little Truck Toet – Stories",
+   "description": "Story episodes with Little Truck Toet, the friendly electric truck. All music and animation is original.",
+   "any": [
+    "toet"
+   ]
+  },
+  {
+   "title": "Fun Learning for Toddlers",
+   "description": "Short story videos about colours, shapes, opposites, feelings and more – with Little Truck Toet and The Big Four. All music and animation is original.",
+   "any": []
+  }
+ ]
+}
