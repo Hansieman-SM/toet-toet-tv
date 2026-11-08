@@ -53,6 +53,8 @@
 | 2026-11-06 | Safari Babies – Black & white for babies (baby elephant, rhino calf, tortoise, sleeping lion cub outro) | ep/bwd_safari.js T0=144, 45 s | YT 2026-11-07 17:00 · Instagram 17:15 · TikTok 17:30 |
 | 2026-11-07 | Let's Share! – One slice for everyone! (Ella's watermelon) | ep/en08_picnic.js 86.2–119 s | YT 2026-11-08 12:00 · Instagram 12:15 · TikTok 12:30 |
 | 2026-11-07 | Forest Friends – Black & white for babies (smiling tree with bird, owl on a branch, bouncing acorn, bunny) | ep/bwd_forest.js T0=96, 45 s | YT 2026-11-08 17:00 · Instagram 17:15 · TikTok 17:30 |
+| 2026-11-08 | Sunny or Windy? – Splash! Whoosh! What's the weather? (Ella sprays cool water, wind + leaves, Boris's kite) | ep/en04_weather.js 22.0–79.6 s | YT 2026-11-09 12:00 · Instagram 12:15 · TikTok 12:30 |
+| 2026-11-08 | Sleepy Fruit – Black & white for babies (rolling orange slice, grapes, rocking banana, apple + pear asleep in a basket outro) | ep/bwd_fruit.js T0=192, 45 s | YT 2026-11-09 17:00 · Instagram 17:15 · TikTok 17:30 |
 
 ## Theme ideas not used yet
 rain forest at dusk, night farm, space & planets with friendly astronaut animals, savanna sunset (Big Four sleeping), rainy window & cozy room, koi pond, butterflies & flower garden, bedtime train journey with Toet (night countryside).
@@ -70,6 +72,7 @@ rain forest at dusk, night farm, space & planets with friendly astronaut animals
 - 2026-11-06 12:30 Up, Up and Away! · 17:30 Aquarium Friends
 - 2026-11-07 12:30 Where Is Kiki? · 17:30 Safari Babies
 - 2026-11-08 12:30 Let's Share! · 17:30 Forest Friends
+- 2026-11-09 12:30 Sunny or Windy? · 17:30 Sleepy Fruit
 
 ## English remakes of the Dutch videos (2026-10-28, jobs/en-remake-*.sh, scripts *_en.js via tools/make_en.py + en/translations.json)
 Little Truck Toet · The Big Four · Toet Counts Cows · Toet and the Colors · Toet Charges Up · Who Makes This Sound? · Peekaboo! · Who Is the Biggest? · Fun at the Playground · Visiting Grandpa and Grandma · Toet on Safari · Toet Climbs the Mountain · Toet and Bus Bas · Toet at the Car Wash · Toet Delivers the Cake · Toet Has a Flat Tire · Toet in the Rain · Toet Looks for Mama Duck · Good Night, Toet
@@ -95,6 +98,7 @@ Holiday calendar for the daily task (make ~3 days ahead, gentle, never scary): N
 
 | 2026-11-06 | Safari Babies – B&W Baby Sensory #5 (lion cub, baby elephant, giraffe, zebra, yawning hippo, monkey with banana, rhino calf, flamingo on one leg, meerkat on its mound, tortoise peeking out; savanna horizon with grass tufts, two acacias, turning sun rays, gliding birds; outro sleeping lion cub under a crescent moon; kalimba/guitar/cello + savanna wind, 3/4; last 20 min dimmer) | ep/bwd_safari.js + ep/bwd_safari_music.py | YT 2026-11-07 19:30 |
 | 2026-11-07 | Forest Friends – B&W Baby Sensory #6 (owl on a branch, fox with striped tail, hedgehog, deer with little antlers, squirrel with acorn, smiling toadstool, waving bear cub, hopping bunny, bouncing acorn, friendly tree with a bird; pine trees, ferns, falling leaves, twinkling stars; outro little fox asleep under a leaf blanket; flute/harp/piano + forest birds, 4/4; last 20 min dimmer) | ep/bwd_forest.js + ep/bwd_forest_music.py | YT 2026-11-08 19:30 |
+| 2026-11-08 | Sleepy Fruit – B&W Baby Sensory #7 (apple with shine, pear in a striped nightcap, rocking banana, strawberry with seeds, two cherries (one awake, one dozing), watermelon slice with tapping feet, rolling orange slice wheel, grapes with a face, pineapple with diamond pattern, yawning lemon; checkered tablecloth, bunting, twinkling stars, rising sparkles; outro apple + pear asleep in a woven basket; music box/celesta/cello, no ambient, 3/4, G; last 20 min dimmer) | ep/bwd_fruit.js + ep/bwd_fruit_music.py | YT 2026-11-09 19:30 |
 ## Instagram (@toet.friends, since 2026-11-02)
 - 2026-11-02 12:15 Reel: Who Is the Biggest? · 17:15 Reel: Birthday Cake!
 - 2026-11-04 12:15 Reel: Who Lives Here? · 17:15 Reel: Sleepy Farm
@@ -102,3 +106,4 @@ Holiday calendar for the daily task (make ~3 days ahead, gentle, never scary): N
 - 2026-11-06 12:15 Reel: Up, Up and Away! · 17:15 Reel: Aquarium Friends
 - 2026-11-07 12:15 Reel: Where Is Kiki? · 17:15 Reel: Safari Babies
 - 2026-11-08 12:15 Reel: Let's Share! · 17:15 Reel: Forest Friends
+- 2026-11-09 12:15 Reel: Sunny or Windy? · 17:15 Reel: Sleepy Fruit

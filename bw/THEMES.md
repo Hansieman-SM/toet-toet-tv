@@ -11,7 +11,7 @@ Title pattern: "<Theme> 🖤🤍 Black & White Baby Sensory | High Contrast for 
 | 4 | Aquarium | angelfish, goldfish, snail, castle, bubbles diver, shrimp, guppy, plant, clam, ray | kalimba, harp, vibes / sea | 2026-11-06 bw-aquarium |
 | 5 | Safari Babies | lion cub, baby elephant, giraffe, zebra, hippo, monkey, rhino calf, flamingo, meerkat, tortoise | marimba-like kalimba, guitar, cello / wind | 2026-11-07 bw-safari-babies |
 | 6 | Forest Friends | owl, fox, hedgehog, deer, squirrel, mushroom, bear, rabbit, acorn, tree | flute, harp, piano / forest | 2026-11-08 bw-forest-friends |
-| 7 | Sleepy Fruit | apple, pear, banana, strawberry, cherry, watermelon, orange, grapes, pineapple, lemon (with sleepy faces) | musicbox, celesta, cello / none | |
+| 7 | Sleepy Fruit | apple, pear, banana, strawberry, cherry, watermelon, orange, grapes, pineapple, lemon (with sleepy faces) | musicbox, celesta, cello / none | 2026-11-09 bw-sleepy-fruit |
 | 8 | Arctic Friends | penguin, polar bear, seal, walrus, arctic fox, snowflake, igloo, whale, puffin, iceberg | celesta, flute, cello / wind | |
 | 9 | Butterflies and Bees | butterfly, bee, ladybird, flower, dragonfly, caterpillar, snail, beehive, leaf, sunflower | kalimba, flute, harp / forest | |
 | 10 | Little Vehicles | Little Truck Toet, bus, train, boat, plane, bicycle, tractor, helicopter, scooter, balloon | piano, musicbox, cello / none | |
