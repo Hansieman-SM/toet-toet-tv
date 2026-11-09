@@ -770,3 +770,65 @@ def leaves_long(dur, shift=0):
                     tr.add(recorder(f, L), t0 + p*E, .1, .42)
                 p += ln
     return tr.buf
+
+# ---------- "Toet's ABC Drive" (learning series, ABC 1): sunny country drive in G, 4/4 ~96 bpm – toy piano lead, mandolin tremolo chords, low marimba bass, finger snaps + shaker ----------
+AB_A = [[('D5',1),('G5',1),('B5',2),('A5',1),('G5',1),('E5',2)], [('D5',2),('E5',1),('G5',1),('A5',3),('-',1)], [('B5',1),('A5',1),('G5',2),('E5',2),('C6',2)], [('B5',6),('-',2)],
+        [('D5',1),('G5',1),('B5',2),('D6',2),('B5',2)], [('C6',1),('B5',1),('A5',2),('E5',4)], [('F#5',1),('G5',1),('A5',1),('B5',1),('A5',2),('F#5',2)], [('G5',6),('-',2)]]
+AB_ACH = ['G','C','Em','D','G','Am','D','G']
+AB_B = [[('E5',2),('G5',2),('C6',3),('-',1)], [('B5',2),('G5',2),('D5',4)], [('C5',1),('E5',1),('A5',2),('G5',2),('E5',2)], [('F#5',6),('-',2)],
+        [('E5',1),('F#5',1),('G5',2),('B5',2),('G5',2)], [('A5',2),('C6',2),('B5',4)], [('A5',1),('B5',1),('A5',1),('G5',1),('F#5',2),('A5',2)], [('G5',6),('-',2)]]
+AB_BCH = ['C','G','Am','D','Em','C','D','G']
+
+def toypiano(f, length):
+    n = int(length*SR); t = tt(n)
+    det = 1.0035                                          # slightly out-of-tune metal tines = toy piano
+    s = (np.sin(2*np.pi*f*t) + .8*np.sin(2*np.pi*f*det*t)) * np.exp(-t/.55) + .35*np.sin(2*np.pi*f*5.4*t)*np.exp(-t/.05) + .25*np.sin(2*np.pi*f*2*t)*np.exp(-t/.25)
+    return s * np.minimum(t/.002, 1) * .45
+
+def mandolin(freqs, length=.6, rate=11.0):
+    n = int(length*SR); t = tt(n); out = np.zeros(n)
+    step = int(SR/rate)
+    for k, st0 in enumerate(range(0, n, step)):           # soft tremolo: repeated light picks
+        m = n - st0; tk = tt(m); g = .75 if k % 2 else 1.0
+        for f in freqs:
+            for f2 in (f, f*1.002):                       # paired strings
+                out[st0:] += sum(np.sin(2*np.pi*h*f2*tk) * np.exp(-tk*(9 + h*5)) / h for h in range(1, 6)) * g
+    env = np.ones(n); cut = int(n*.85); env[cut:] = np.linspace(1, 0, n-cut)
+    return out * env / (4*len(freqs)) * .5
+
+def snap():
+    n = int(.08*SR); t = tt(n)
+    return band(rng.standard_normal(n), 1800, 6000) * np.exp(-t/.012) * .9
+
+def abc_long(dur, shift=0):
+    BEAT = .625; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'G': ('G2', ['G3','B3','D4']), 'C': ('C3', ['C4','E4','G4']), 'D': ('D3', ['D4','F#4','A4']), 'Em': ('E2', ['E3','G3','B3']), 'Am': ('A2', ['A3','C4','E4'])}
+    FIFTH = {'G': 'D3', 'C': 'G2', 'D': 'A2', 'Em': 'B2', 'Am': 'E3'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(AB_A, AB_ACH), (AB_B, AB_BCH), (None, ['G','Em','C','D','G','Em','Am','D']), (AB_A, AB_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'G'),(None,'D')] + body[:nb - 4] + [(AB_A[6], 'D'), ([('G5',8)], 'G')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch3 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch3]; rf = freq(root, shift); ff = freq(FIFTH[ch], shift)
+        if not fin:
+            for b, f in ((0, rf), (2, ff)): tr.add(marimba(f, .9), t0 + b*BEAT, 0, .55)
+            tr.add(marimba(rf, .4), t0 + 3*BEAT + E, 0, .3)
+            tr.add(mandolin(fr, 2*BEAT), t0, -.35, .2); tr.add(mandolin(fr, 2*BEAT), t0 + 2*BEAT, -.35, .17)
+            if bi >= 2:
+                for b in (1, 3): tr.add(snap(), t0 + b*BEAT, .3, .35)
+                for k in range(8): tr.add(shaker(), t0 + k*E, .45, .07 if k % 2 else .11)
+        else:
+            tr.add(marimba(rf, 2.0), t0, 0, .6); tr.add(mandolin(fr, 2.4), t0, -.35, .25)
+        if mel is None and not fin and bi >= 2:
+            for k, n in enumerate([ch3[0], ch3[1], ch3[2], ch3[1]]): tr.add(toypiano(freq(n, shift)*2, .8), t0 + k*BEAT + E, .25, .14)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = max(.6, ln*E) + (1.2 if fin else 0)
+                    tr.add(toypiano(f, L), t0 + p*E, .1, .5)
+                p += ln
+    return tr.buf
