@@ -832,3 +832,149 @@ def abc_long(dur, shift=0):
                     tr.add(toypiano(f, L), t0 + p*E, .1, .5)
                 p += ln
     return tr.buf
+
+# ---------- "10 Little Snowflakes" (learning series, counting 2): gentle winter waltz in E-flat, 3/4 ~108 bpm –
+# celesta lead, harp waltz chords (oom-pah-pah), soft string pad, sleigh-bell shaker ----------
+SN_A = [[('A#5',3),('G5',1),('D#5',2)], [('C6',2),('A#5',2),('G#5',2)], [('F5',2),('G5',1),('G#5',1),('A#5',2)], [('G5',4),('-',2)],
+        [('G5',2),('C6',2),('D#6',2)], [('D6',3),('C6',1),('G#5',2)], [('A#5',2),('F5',2),('D5',2)], [('D#5',4),('-',2)]]
+SN_ACH = ['Eb','Ab','Bb','Eb','Cm','Ab','Bb','Eb']
+SN_B = [[('C6',2),('D#6',2),('C6',2)], [('A#5',4),('G5',2)], [('G#5',2),('C6',2),('G#5',2)], [('F5',4),('-',2)],
+        [('D#5',1),('F5',1),('G5',2),('G#5',2)], [('A#5',2),('D#6',2),('A#5',2)], [('C6',2),('A#5',1),('G#5',1),('F5',2)], [('D#5',4),('-',2)]]
+SN_BCH = ['Ab','Eb','Fm','Bb','Ab','Eb','Bb','Eb']
+
+def celesta(f, length):
+    n = int(length*SR); t = tt(n)
+    s = np.sin(2*np.pi*f*t) * np.exp(-t/1.1) + .3*np.sin(2*np.pi*2*f*t)*np.exp(-t/.35) + .12*np.sin(2*np.pi*3.98*f*t)*np.exp(-t/.07) \
+        + .08*np.sin(2*np.pi*f*.5*t)*np.exp(-t/.6)                    # soft felt hammer + warm sub-partial
+    return s * np.minimum(t/.003, 1) * .5
+
+def harp(freqs, length=.9):
+    n = int(length*SR); t = tt(n); out = np.zeros(n)
+    for j, f in enumerate(freqs):
+        d = int(j*.012*SR)                                             # tiny roll from low to high string
+        if d >= n: break
+        tk = tt(n - d)
+        out[d:] += sum(np.sin(2*np.pi*h*f*tk) * np.exp(-tk*(2.2 + h*2.5)) / (h*h) for h in range(1, 5))
+    return out * np.minimum(t/.004, 1) / len(freqs) * .7
+
+def string_pad(freqs, length):
+    n = int(length*SR); t = tt(n); out = np.zeros(n)
+    vib = 1 + .003*np.sin(2*np.pi*5.2*t)
+    for f in freqs:
+        for dt in (.996, 1.0, 1.004):                                  # three slightly detuned players
+            ph = 2*np.pi*f*dt*np.cumsum(vib)/SR
+            out += np.sin(ph) + .45*np.sin(2*ph) + .2*np.sin(3*ph) + .08*np.sin(4*ph)
+    env = np.minimum(t/.45, 1) * np.minimum((length - t)/.5, 1)
+    return out * np.clip(env, 0, 1) / (3*len(freqs)) * .35
+
+def soft_bass(f, length):
+    n = int(length*SR); t = tt(n)
+    return (np.sin(2*np.pi*f*t) + .3*np.sin(2*np.pi*2*f*t)*np.exp(-t/.3)) * np.minimum(t/.01, 1) * np.exp(-t/.9) * .8
+
+_SLEIGH = []
+def sleigh(v=0):
+    if not _SLEIGH:                                                    # three pre-made jingle variants (little bells + rattle)
+        r = np.random.default_rng(77)
+        for _ in range(3):
+            n = int(.22*SR); out = np.zeros(n)
+            for d in (0, .011, .024, .04):
+                i = int(d*SR); tk = tt(n - i)
+                for fb in r.uniform(3800, 7600, 3): out[i:] += np.sin(2*np.pi*fb*tk) * np.exp(-tk/.05) * .3
+            out += band(r.standard_normal(n), 6000, 13000) * np.exp(-tt(n)/.03) * .5
+            _SLEIGH.append(out * .5)
+    return _SLEIGH[v % 3]
+
+def snow_long(dur, shift=0):
+    BEAT = .56; E = BEAT/2; BAR = 3*BEAT
+    tr = Track(dur)
+    CH = {'Eb': ('D#2', ['D#4','G4','A#4']), 'Ab': ('G#2', ['G#3','C4','D#4']), 'Bb': ('A#2', ['A#3','D4','F4']),
+          'Cm': ('C3', ['C4','D#4','G4']), 'Fm': ('F2', ['F3','G#3','C4'])}
+    FIFTH = {'Eb': 'A#2', 'Ab': 'D#3', 'Bb': 'F2', 'Cm': 'G2', 'Fm': 'C3'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(SN_A, SN_ACH), (SN_B, SN_BCH), (None, ['Eb','Cm','Ab','Bb','Eb','Cm','Fm','Bb']), (SN_A, SN_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'Eb'),(None,'Bb')] + body[:nb - 4] + [(SN_A[6], 'Bb'), ([('D#5',6)], 'Eb')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch3 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch3]
+        rf = freq(root if bi % 2 == 0 else FIFTH[ch], shift)
+        if not fin:
+            tr.add(soft_bass(rf, BAR), t0, 0, .38)
+            for b in (1, 2): tr.add(harp(fr, .8), t0 + b*BEAT, -.3, .26 if b == 1 else .2)
+            tr.add(string_pad([f*2 for f in fr], BAR + .3), t0, .2, .16)
+            if bi >= 2:
+                for b in (1, 2): tr.add(sleigh(bi + b), t0 + b*BEAT, .4, .3)
+                tr.add(sleigh(bi), t0 + 2*BEAT + E, .4, .15)
+        else:
+            tr.add(soft_bass(freq(root, shift), 3.0), t0, 0, .6); tr.add(harp(fr, 2.5), t0, -.3, .3)
+            tr.add(string_pad([f*2 for f in fr], 3.0), t0, .2, .18); tr.add(sleigh(1), t0, .4, .15)
+        if mel is None and not fin and bi >= 2:
+            for k, n in enumerate([ch3[0], ch3[1], ch3[2], ch3[1], ch3[2], ch3[0]]):
+                tr.add(celesta(freq(n, shift)*2, .9), t0 + k*E, .3, .16)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = max(.7, ln*E + .5) + (1.6 if fin else 0)
+                    tr.add(celesta(f, L), t0 + p*E, .05, .55)
+                p += ln
+    return tr.buf
+
+# ---------- "Rosie the Recycling Truck" (episode en09, Toet's Helper Friends): cheerful 'busy work' groove in F, 4/4 ~110 bpm –
+# soft pulse-wave lead with vibrato, electric-piano offbeat chords, round triangle bass, woodblock + soft kick + light claps ----------
+RC_A = [[('C5',1),('F5',1),('A5',1),('C6',1),('A5',2),('F5',2)], [('G5',1),('A5',1),('G5',1),('E5',1),('C5',4)], [('D5',1),('F5',1),('A#5',2),('A5',1),('G5',1),('F5',2)], [('E5',2),('G5',2),('C6',3),('-',1)],
+        [('C5',1),('F5',1),('A5',1),('C6',1),('D6',2),('C6',2)], [('A#5',1),('A5',1),('G5',2),('D5',4)], [('E5',1),('F5',1),('G5',1),('A#5',1),('A5',2),('G5',2)], [('F5',6),('-',2)]]
+RC_ACH = ['F','C','A#','C','F','Gm','C','F']
+RC_B = [[('A5',2),('A#5',1),('A5',1),('G5',2),('F5',2)], [('E5',2),('F5',1),('G5',1),('C5',4)], [('F5',2),('G5',1),('A5',1),('A#5',2),('D6',2)], [('C6',6),('-',2)],
+        [('D6',2),('C6',1),('A#5',1),('A5',2),('F5',2)], [('G5',2),('A5',1),('A#5',1),('A5',4)], [('G5',1),('F5',1),('E5',1),('F5',1),('G5',2),('E5',2)], [('F5',6),('-',2)]]
+RC_BCH = ['Dm','C','A#','F','Dm','F','C','F']
+
+def pulse_lead(f, length):
+    n = int(length*SR); t = tt(n)
+    vib = 1 + .006*np.sin(2*np.pi*5.2*t)*np.minimum(t/.25, 1)
+    ph = np.cumsum(f*vib)/SR
+    s = sum(np.sin(2*np.pi*h*ph)*(1.0/h)*(1 if h % 2 else .35) for h in range(1, 7))     # soft square-ish (odd harmonics strong)
+    env = np.minimum(t/.015, 1) * np.exp(-t/1.6); cut = int(n*.8); env[cut:] *= np.linspace(1, 0, n-cut)
+    return s * env * .32
+
+def epiano(freqs, length=.35):
+    n = int(length*SR); t = tt(n); out = np.zeros(n)
+    for f in freqs:
+        mod = np.sin(2*np.pi*f*14*t) * 1.2 * np.exp(-t/.08)            # FM 'tine' attack
+        out += np.sin(2*np.pi*f*t + mod) * np.exp(-t/.5)
+    env = np.minimum(t/.004, 1); cut = int(n*.7); env[cut:] *= np.linspace(1, 0, n-cut)
+    return out * env / len(freqs) * .5
+
+def recycle_long(dur, shift=0):
+    BEAT = .545; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'F': ('F2', ['F3','A3','C4']), 'C': ('C3', ['E3','G3','C4']), 'A#': ('A#2', ['D3','F3','A#3']), 'Gm': ('G2', ['G3','A#3','D4']), 'Dm': ('D3', ['D3','F3','A3'])}
+    FIFTH = {'F': 'C3', 'C': 'G2', 'A#': 'F2', 'Gm': 'D3', 'Dm': 'A2'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(RC_A, RC_ACH), (RC_B, RC_BCH), (None, ['F','Dm','A#','C','F','Dm','Gm','C']), (RC_A, RC_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'F'),(None,'C')] + body[:nb - 4] + [(RC_A[6], 'C'), ([('F5',8)], 'F')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch3 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch3]; rf = freq(root, shift); ff = freq(FIFTH[ch], shift)
+        if not fin:
+            for b, f in ((0, rf), (1.5, ff), (2, rf), (3, ff)): tr.add(tri_bass(f, .4), t0 + b*BEAT, 0, .42)
+            for b in (0, 1, 2, 3): tr.add(epiano(fr, .3), t0 + b*BEAT + E, -.3, .3)
+            if bi >= 2:
+                for b in (0, 2): tr.add(kick(), t0 + b*BEAT, 0, .28)
+                for b in (1, 3): tr.add(clap(), t0 + b*BEAT, .15, .16)
+                for b in (0, 1.5, 2.5, 3.5): tr.add(woodblock(1.3 if b % 1 else 1.0), t0 + b*BEAT, .4, .14)
+        else:
+            tr.add(tri_bass(rf, 1.6), t0, 0, .5); tr.add(epiano(fr, 1.8), t0, -.3, .4)
+        if mel is None and not fin and bi >= 2:
+            for k, n in enumerate([ch3[0], ch3[2], ch3[1], ch3[2]]): tr.add(glock(freq(n, shift)*2, .5), t0 + k*BEAT + E, .3, .1)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E*.92 + (1.2 if fin else 0)
+                    tr.add(pulse_lead(f, L), t0 + p*E, .1, .4)
+                p += ln
+    return tr.buf
