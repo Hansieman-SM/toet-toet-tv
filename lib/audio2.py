@@ -978,3 +978,118 @@ def recycle_long(dur, shift=0):
                     tr.add(pulse_lead(f, L), t0 + p*E, .1, .4)
                 p += ln
     return tr.buf
+
+# ---------- "Animal ABC with The Big Four" (learning series, ABC 2): jaunty savanna tune in D major, 4/4 ~115 bpm –
+# balafon lead (wooden bars with a soft buzz), plucked bass, offbeat kalimba chords, djembe pattern + shaker ----------
+AA_A = [[('A4',1),('D5',1),('F#5',2),('E5',1),('D5',1),('B4',2)], [('A4',2),('B4',1),('D5',1),('E5',3),('-',1)],
+        [('F#5',1),('G5',1),('A5',2),('B5',1),('A5',1),('F#5',2)], [('E5',4),('-',2),('C#5',1),('E5',1)],
+        [('D5',1),('F#5',1),('A5',2),('D6',2),('B5',1),('A5',1)], [('G5',2),('B5',1),('A5',1),('G5',2),('E5',2)],
+        [('F#5',1),('E5',1),('D5',1),('E5',1),('F#5',2),('E5',2)], [('D5',4),('-',4)]]
+AA_ACH = ['D','A','G','A','D','G','A','D']
+AA_B = [[('B5',2),('A5',1),('F#5',1),('B5',2),('D6',2)], [('A5',3),('F#5',1),('E5',4)],
+        [('G5',1),('A5',1),('B5',2),('G5',1),('E5',1),('B4',2)], [('A4',1),('C#5',1),('E5',1),('A5',1),('G5',2),('E5',2)],
+        [('F#5',2),('D5',1),('F#5',1),('A5',2),('F#5',2)], [('G5',1),('F#5',1),('E5',1),('D5',1),('B4',2),('D5',2)],
+        [('E5',2),('A5',2),('G5',1),('F#5',1),('E5',2)], [('D5',2),('-',6)]]
+AA_BCH = ['Bm','A','G','A','D','Em','A','D']
+
+def balafon(f, length):
+    n = int(length*SR); t = tt(n)
+    body = np.sin(2*np.pi*f*t) * np.exp(-t/.32) + .45*np.sin(2*np.pi*f*3.9*t)*np.exp(-t/.05) + .2*np.sin(2*np.pi*f*9.2*t)*np.exp(-t/.012)
+    buzz = band(rng.standard_normal(n), f*1.5, min(f*6, 12000)) * np.exp(-t/.09) * (1 + np.sin(2*np.pi*f*t)) * .12   # gourd-resonator buzz
+    env = np.minimum(t/.002, 1); cut = int(n*.85); env[cut:] *= np.linspace(1, 0, n-cut)
+    return (body + buzz) * env * .5
+
+def animal_abc_long(dur, shift=0):
+    BEAT = .52; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'D': ('D2', ['D4','F#4','A4']), 'A': ('A1', ['C#4','E4','A4']), 'G': ('G1', ['B3','D4','G4']), 'Bm': ('B1', ['B3','D4','F#4']), 'Em': ('E2', ['B3','E4','G4'])}
+    FIFTH = {'D': 'A2', 'A': 'E2', 'G': 'D2', 'Bm': 'F#2', 'Em': 'B2'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(AA_A, AA_ACH), (AA_B, AA_BCH), (None, ['D','Bm','G','A','D','Bm','Em','A']), (AA_A, AA_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'D'),(None,'A')] + body[:nb - 4] + [(AA_A[6], 'A'), ([('D5',8)], 'D')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch3 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch3]; rf = freq(root, shift)*2; ff = freq(FIFTH[ch], shift)
+        if not fin:
+            for b, f, L in ((0, rf, .5), (1.5, rf, .25), (2, ff, .5), (3.5, ff*2 if ff < 90 else ff, .25)): tr.add(pluck([f], L*2), t0 + b*BEAT, 0, .55)
+            for b in (0, 1, 2, 3): tr.add(kalimba(fr, .3), t0 + b*BEAT + E, -.3, .2)
+            if bi >= 2:
+                for b in (0, 2.5): tr.add(djembe_low(), t0 + b*BEAT, -.1, .45)
+                for b in (1, 3, 3.5): tr.add(djembe_slap(), t0 + b*BEAT, .2, .2 if b != 3.5 else .12)
+                for k in range(8): tr.add(shaker(), t0 + k*E, .45, .06 if k % 2 else .1)
+        else:
+            tr.add(pluck([rf], 1.6), t0, 0, .6); tr.add(kalimba(fr, 1.6), t0, -.3, .3); tr.add(djembe_low(), t0, -.1, .45)
+        if mel is None and not fin and bi >= 2:
+            for k, n in enumerate([ch3[0], ch3[1], ch3[2], ch3[1]]): tr.add(marimba(freq(n, shift)*2, .5), t0 + k*BEAT + E, .3, .12)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = max(.5, ln*E) + (1.2 if fin else 0)
+                    tr.add(balafon(f, L), t0 + p*E, .1, .55)
+                    if ln >= 2 and not fin: tr.add(balafon(f, .25), t0 + p*E + E, .1, .2)   # bar 'roll' on long notes
+                p += ln
+    return tr.buf
+
+# ---------- "Tall Tower!" (episode en10, The Big Four): bouncy ragtime-style piano in C, 2-feel ~100 bpm –
+# honky-tonk piano melody (syncopated), stride left hand (bass on 1/3, chords on 2/4), muted banjo-ish chops, soft brushes + woodblock ----------
+TW_A = [[('E5',1),('G5',1),('C6',2),('A5',1),('C6',1),('G5',2)], [('F5',1),('A5',1),('G5',1),('E5',1),('D5',4)],
+        [('D5',1),('F5',1),('B5',2),('A5',1),('B5',1),('G5',2)], [('E5',1),('G5',1),('C6',1),('E6',1),('D6',3),('-',1)],
+        [('E5',1),('G5',1),('C6',2),('E6',1),('D6',1),('C6',2)], [('A5',1),('C6',1),('A5',1),('F5',1),('E5',2),('G5',2)],
+        [('F5',1),('E5',1),('D5',1),('E5',1),('G5',2),('B4',2)], [('C5',4),('E5',1),('G5',1),('C6',2)]]
+TW_ACH = ['C','F','G','C','C','F','G','C']
+TW_B = [[('A5',2),('A5',1),('B5',1),('C6',2),('A5',2)], [('G5',2),('E5',1),('G5',1),('C6',4)],
+        [('F5',2),('F5',1),('G5',1),('A5',2),('F5',2)], [('E5',3),('D5',1),('E5',4)],
+        [('A5',1),('B5',1),('C6',1),('D6',1),('E6',2),('C6',2)], [('D6',1),('C6',1),('B5',1),('A5',1),('G5',4)],
+        [('A5',1),('G5',1),('F5',1),('E5',1),('D5',2),('G5',2)], [('C6',4),('-',4)]]
+TW_BCH = ['Am','C','F','C','Am','G','D7','G']
+
+def honky(f, length):
+    n = int(length*SR); t = tt(n); out = np.zeros(n)
+    for d in (1.0, 1.004):                                    # two slightly detuned strings = honky-tonk
+        out += sum(np.sin(2*np.pi*h*f*d*t) * np.exp(-t*(2.2 + h*1.6)) / h**1.3 for h in range(1, 8))
+    out += band(rng.standard_normal(n), 2000, 6000) * np.exp(-t/.004) * .15  # hammer
+    env = np.minimum(t/.003, 1); cut = int(n*.85); env[cut:] *= np.linspace(1, 0, n-cut)
+    return out * env * .22
+
+def chop(freqs, length=.18):
+    n = int(length*SR); t = tt(n); out = np.zeros(n)
+    for f in freqs: out += sum(np.sin(2*np.pi*h*f*t) * np.exp(-t*(30 + h*8)) / h for h in range(1, 6))
+    return out / len(freqs) * .5
+
+def tower_long(dur, shift=0):
+    BEAT = .6; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'C': ('C3', ['E3','G3','C4']), 'F': ('F2', ['F3','A3','C4']), 'G': ('G2', ['F3','B3','D4']), 'Am': ('A2', ['E3','A3','C4']), 'D7': ('D3', ['F#3','A3','C4'])}
+    FIFTH = {'C': 'G2', 'F': 'C3', 'G': 'D3', 'Am': 'E2', 'D7': 'A2'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(TW_A, TW_ACH), (TW_B, TW_BCH), (None, ['C','Am','F','G','C','Am','D7','G']), (TW_A, TW_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'C'),(None,'G')] + body[:nb - 4] + [(TW_A[6], 'G'), ([('C5',8)], 'C')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch3 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch3]; rf = freq(root, shift); ff = freq(FIFTH[ch], shift)
+        if not fin:
+            for b, f in ((0, rf), (2, ff)): tr.add(honky(f, .55), t0 + b*BEAT, -.15, .5)          # stride: bass on 1 and 3
+            for b in (1, 3):
+                for f in fr: tr.add(honky(f, .3), t0 + b*BEAT, -.15, .16)                      # chords on 2 and 4
+            if bi >= 2:
+                for b in (1, 3): tr.add(chop(fr), t0 + b*BEAT + .01, .35, .2)
+                for k in range(8): tr.add(brush_hit(), t0 + k*E, .2, .05 if k % 2 else .08)
+                tr.add(woodblock(1.2), t0 + 3*BEAT + E, .45, .12)
+        else:
+            tr.add(honky(rf, 2.2), t0, -.15, .6)
+            for f in fr: tr.add(honky(f, 2.2), t0, -.15, .22)
+        if mel is None and not fin and bi >= 2:
+            for k, n in enumerate([ch3[2], ch3[1], ch3[2], ch3[0]]): tr.add(glock(freq(n, shift)*2, .5), t0 + k*BEAT + E, .3, .1)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = max(.4, ln*E*1.2) + (1.4 if fin else 0)
+                    tr.add(honky(f, L), t0 + p*E, .15, .55); tr.add(honky(f*2, L*.6), t0 + p*E, .15, .1)
+                p += ln
+    return tr.buf
