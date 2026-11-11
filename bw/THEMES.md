@@ -14,7 +14,7 @@ Title pattern: "<Theme> 🖤🤍 Black & White Baby Sensory | High Contrast for 
 | 7 | Sleepy Fruit | apple, pear, banana, strawberry, cherry, watermelon, orange, grapes, pineapple, lemon (with sleepy faces) | musicbox, celesta, cello / none | 2026-11-09 bw-sleepy-fruit |
 | 8 | Arctic Friends | penguin, polar bear, seal, walrus, arctic fox, snowflake, igloo, whale, puffin, iceberg | celesta, flute, cello / wind | 2026-11-10 bw-arctic-friends |
 | 9 | Butterflies and Bees | butterfly, bee, ladybird, flower, dragonfly, caterpillar, snail, beehive, leaf, sunflower | kalimba, flute, harp / forest | 2026-11-11 bw-butterflies-and-bees |
-| 10 | Little Vehicles | Little Truck Toet, bus, train, boat, plane, bicycle, tractor, helicopter, scooter, balloon | piano, musicbox, cello / none || 2026-11-12 bw-little-vehicles |
+| 10 | Little Vehicles | Little Truck Toet, bus, train, boat, plane, bicycle, tractor, helicopter, scooter, balloon | piano, musicbox, cello / none | 2026-11-12 bw-little-vehicles |
 | 11 | Shapes Dance | circle, square, triangle, star, heart, spiral, hexagon, checkerboard, stripes, dots | vibes, kalimba, piano / none | |
 | 12 | Coral Reef | coral, clownfish-like fish, sea turtle, ray, eel, anemone, shell, sea snail, urchin, shrimp | harp, vibes, cello / sea | |
 | 13 | Jungle Night | sloth, toucan, frog, tiger cub, parrot, chameleon, snake (friendly), leaf, monkey, firefly | flute, guitar, cello / night | |
