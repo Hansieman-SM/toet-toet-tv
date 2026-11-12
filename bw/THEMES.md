@@ -15,7 +15,7 @@ Title pattern: "<Theme> 🖤🤍 Black & White Baby Sensory | High Contrast for 
 | 8 | Arctic Friends | penguin, polar bear, seal, walrus, arctic fox, snowflake, igloo, whale, puffin, iceberg | celesta, flute, cello / wind | 2026-11-10 bw-arctic-friends |
 | 9 | Butterflies and Bees | butterfly, bee, ladybird, flower, dragonfly, caterpillar, snail, beehive, leaf, sunflower | kalimba, flute, harp / forest | 2026-11-11 bw-butterflies-and-bees |
 | 10 | Little Vehicles | Little Truck Toet, bus, train, boat, plane, bicycle, tractor, helicopter, scooter, balloon | piano, musicbox, cello / none | 2026-11-12 bw-little-vehicles |
-| 11 | Shapes Dance | circle, square, triangle, star, heart, spiral, hexagon, checkerboard, stripes, dots | vibes, kalimba, piano / none | |
+| 11 | Shapes Dance | circle, square, triangle, star, heart, spiral, hexagon, checkerboard, stripes, dots | vibes, kalimba, piano / none | 2026-11-13 bw-shapes-dance |
 | 12 | Coral Reef | coral, clownfish-like fish, sea turtle, ray, eel, anemone, shell, sea snail, urchin, shrimp | harp, vibes, cello / sea | |
 | 13 | Jungle Night | sloth, toucan, frog, tiger cub, parrot, chameleon, snake (friendly), leaf, monkey, firefly | flute, guitar, cello / night | |
 | 14 | Rain and Clouds | cloud, raindrop, umbrella, rainbow arc, puddle, boots, duck, snail, sun, frog | piano, celesta, harp / rain | |

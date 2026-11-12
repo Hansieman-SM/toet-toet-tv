@@ -1093,3 +1093,62 @@ def tower_long(dur, shift=0):
                     tr.add(honky(f, L), t0 + p*E, .15, .55); tr.add(honky(f*2, L*.6), t0 + p*E, .15, .1)
                 p += ln
     return tr.buf
+
+# ---------- "Can You Find It? Colours" (learning #5, Little Truck Toet): calm, curious folk shuffle in F, ~92 bpm –
+# soft harmonica lead (reedy, gentle vibrato), fingerpicked arpeggios (pluck), walking upright bass, brushes + a soft triangle on 4.
+# The middle 'thinking' sections drop the lead so the 3-dot pauses stay quiet. ----------
+FI_A = [[('C5',2),('F5',2),('A5',2),('G5',2)], [('F5',3),('D5',1),('C5',4)], [('A#4',2),('D5',2),('F5',2),('E5',2)], [('G5',6),('-',2)],
+        [('A5',2),('C6',2),('A5',2),('F5',2)], [('G5',3),('F5',1),('D5',4)], [('E5',2),('G5',2),('A#5',2),('E5',2)], [('F5',6),('-',2)]]
+FI_ACH = ['F','Dm','A#','C','F','Gm','C','F']
+FI_B = [[('D5',2),('F5',2),('A5',4)], [('C5',2),('E5',2),('G5',4)], [('A#4',2),('D5',2),('F5',3),('E5',1)], [('D5',2),('C5',2),('A4',4)],
+        [('D5',2),('F5',2),('A5',3),('A#5',1)], [('C6',4),('A5',2),('F5',2)], [('G5',2),('A5',2),('A#5',2),('E5',2)], [('F5',6),('-',2)]]
+FI_BCH = ['Dm','C','A#','F','Dm','F','C','F']
+
+def harmonica(f, length):
+    """Reedy free-reed tone: odd-heavy partials, breathy attack, slow vibrato fading in, soft release."""
+    n = int(length*SR); t = tt(n)
+    vib = 1 + .006*np.sin(2*np.pi*5.2*t) * np.minimum(t/.4, 1)
+    ph = 2*np.pi*np.cumsum(f*vib)/SR
+    s = np.sin(ph) + .5*np.sin(2*ph) + .45*np.sin(3*ph) + .18*np.sin(4*ph) + .15*np.sin(5*ph)
+    s += band(rng.standard_normal(n), f, min(f*6, 9000)) * .06                     # breath
+    env = np.minimum(t/.05, 1) * np.clip((length - t)/.12, 0, 1) * (1 - .15*np.exp(-t/.08))
+    from scipy.signal import lfilter, butter
+    return lfilter(*butter(2, min(5500, f*7)/(SR/2)), s) * env * .28
+
+def triangle_ping():
+    n = int(.9*SR); t = tt(n)
+    return (np.sin(2*np.pi*3300*t) + .5*np.sin(2*np.pi*5100*t)) * np.exp(-t/.35) * .25
+
+def findit_long(dur, shift=0):
+    BEAT = .65; E = BEAT/2; BAR = 4*BEAT; SW = E*.16
+    tr = Track(dur)
+    CH = {'F': ('F2', ['F3','A3','C4']), 'Dm': ('D2', ['D3','F3','A3']), 'A#': ('A#1', ['D3','F3','A#3']), 'C': ('C2', ['E3','G3','C4']), 'Gm': ('G1', ['D3','G3','A#3'])}
+    WALK = {'F': ['F2','A2','C3','A2'], 'Dm': ['D2','F2','A2','F2'], 'A#': ['A#1','D2','F2','D2'], 'C': ['C2','E2','G2','E2'], 'Gm': ['G1','A#1','D2','A#1']}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(FI_A, FI_ACH), (None, ['F','Dm','A#','C','F','Dm','Gm','C']), (FI_B, FI_BCH), (None, ['A#','F','Gm','C','Dm','A#','C','F'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'F'),(None,'C')] + body[:nb - 4] + [(FI_A[6], 'C'), ([('F5',8)], 'F')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch3 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch3]
+        if not fin:
+            for b, nm in enumerate(WALK[ch]): tr.add(pluck([freq(nm, shift)], .55), t0 + b*BEAT, -.05, .5)
+            pat = [0, 2, 1, 2, 0, 2, 1, 2]
+            for k, j in enumerate(pat): tr.add(pluck([fr[j]*2], .5), t0 + k*E + (SW if k % 2 else 0), .3, .15)
+            if bi >= 2:
+                for k in range(8): tr.add(brush_hit(), t0 + k*E + (SW if k % 2 else 0), .15, .045 if k % 2 else .07)
+                tr.add(triangle_ping(), t0 + 3*BEAT, .5, .05)
+        else:
+            tr.add(pluck([freq(root, shift)], 2.0), t0, 0, .55)
+            for f in fr: tr.add(pluck([f*2], 2.0), t0, .3, .2)
+        if mel is None and not fin and bi >= 2 and bi % 2 == 0:
+            tr.add(glock(fr[2]*4, .9), t0 + 2*BEAT, .35, .05)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = max(.4, ln*E*.95) + (1.4 if fin else 0)
+                    tr.add(harmonica(f, L), t0 + p*E + (SW if p % 2 else 0), .1, .5)
+                p += ln
+    return tr.buf
