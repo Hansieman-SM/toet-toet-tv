@@ -18,3 +18,4 @@ Mark a theme as used with date + job name. Seasonal: autumn until ±Nov 30, wint
 | 11 | Counting | 10 Christmas Baubles on the tree (December) | Little Truck Toet | |
 | 12 | Counting | 10 Presents from Santa (own Santa design, December) | The Big Four | |
 | 13 | ABC | Winter ABC (I Igloo, M Mitten, S Snowman, P Penguin…) | Little Truck Toet | |
+| 14 | Color Mixing (approved 2026-11-12) | Toet's Color Mixing: two paint pots pour together → red + yellow = orange, blue + yellow = green, red + blue = purple; 3-dot "what will it be?" pause before each reveal, recap | Little Truck Toet | |
