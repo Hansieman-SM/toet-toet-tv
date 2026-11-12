@@ -6,7 +6,8 @@ from PIL import Image, ImageDraw, ImageFont
 p = argparse.ArgumentParser(); p.add_argument('src'); p.add_argument('out')
 p.add_argument('--title', required=True); p.add_argument('--sub', default=''); p.add_argument('--cx', type=int, default=960); p.add_argument('--crop', action='store_true', help='4:3 crop around --cx; ONLY for footage without text/speech bubbles')
 p.add_argument('--colors', default='#bfe6f0,#4b6aa6'); p.add_argument('--footer1', default='Toet Toet and Friends TV')
-p.add_argument('--footer2', default='Subscribe for more adventures!'); a = p.parse_args()
+p.add_argument('--footer2', default='Subscribe for more adventures!')
+p.add_argument('--thumb-at', type=float, default=None, help='second for the cover frame (default: 1/3 of the Short)'); a = p.parse_args()
 def font(sz, w='ExtraBold'):
     f = ImageFont.truetype('fonts/Baloo2.ttf', sz); f.set_variation_by_name(w); return f
 INK = '#1d3557'; K = 4 / 3; W, H = 1440, 2560; c1, c2 = a.colors.split(',')   # ontwerp in 1080x1920-maat, uitvoer 1440x2560 (scherper op YouTube)
@@ -33,4 +34,8 @@ crop = f"crop={cw}:{sh}:{cx - cw // 2}:0," if a.crop else ""
 vf = f"[1:v]{crop}scale={vw}:{vh}:flags=lanczos[v];[0:v][v]overlay={vx}:{vy}:shortest=1,format=yuv420p[o]"
 subprocess.run(['ffmpeg', '-v', 'error', '-y', '-loop', '1', '-i', bgp, '-i', a.src, '-filter_complex', vf, '-map', '[o]', '-map', '1:a',
                 '-c:v', 'libx264', '-preset', 'slow', '-tune', 'animation', '-crf', '16', '-r', '30', '-c:a', 'aac', '-b:a', '192k', '-t', str(dur), '-movflags', '+faststart', a.out], check=True)
-print('ok', a.out, dur)
+# cover for YouTube Shorts / Instagram / TikTok (custom Shorts thumbnails exist since 2026): <out>-thumbnail.jpg, 1080x1920
+tp = a.out[:-4] + '-thumbnail.jpg' if a.out.endswith('.mp4') else a.out + '-thumbnail.jpg'
+ta = a.thumb_at if a.thumb_at is not None else dur / 3
+subprocess.run(['ffmpeg', '-v', 'error', '-y', '-ss', f'{ta:.2f}', '-i', a.out, '-frames:v', '1', '-vf', 'scale=1080:1920', '-q:v', '2', tp], check=True)
+print('ok', a.out, dur, tp)
