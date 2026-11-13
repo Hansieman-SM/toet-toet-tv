@@ -1152,3 +1152,137 @@ def findit_long(dur, shift=0):
                     tr.add(harmonica(f, L), t0 + p*E + (SW if p % 2 else 0), .1, .5)
                 p += ln
     return tr.buf
+
+# ---------- "Freddie the Fire Truck" (episode en11): cheerful little brass-band march in B♭ (2/4 feel) ----------
+def siren(length=2.4):
+    """Soft, friendly two-tone 'nee-naw' (gentle sine tones with a little vibrato, never shrill)."""
+    n = int(length*SR); t = tt(n)
+    f = np.where((t // .45) % 2 == 0, 740.0, 587.0) * (1 + .006*np.sin(2*np.pi*6*t))
+    from scipy.signal import lfilter, butter
+    f = lfilter(*butter(1, 30/(SR/2)), f)
+    ph = 2*np.pi*np.cumsum(f)/SR
+    s = np.sin(ph) + .25*np.sin(2*ph)
+    return s * np.minimum(t/.2, 1) * np.clip((length - t)/.4, 0, 1) * .3
+NAMED.update({'siren': siren})
+
+def brass(f, length):
+    """Mellow little brass section: saw-ish partials through a filter that opens on the attack (a soft 'bwah')."""
+    n = int(length*SR); t = tt(n)
+    ph = 2*np.pi*f*t*(1 + .003*np.sin(2*np.pi*5.5*t)*np.minimum(t/.3, 1))
+    s = sum(np.sin(k*ph)/k for k in range(1, 9))
+    s2 = sum(np.sin(k*ph*1.004)/k for k in range(1, 9))
+    from scipy.signal import lfilter, butter
+    bright = lfilter(*butter(2, min(6000, f*7)/(SR/2)), s + s2)
+    dark = lfilter(*butter(2, min(2500, f*2.2)/(SR/2)), s + s2)
+    a = np.exp(-t/.12)
+    env = np.minimum(t/.03, 1) * np.clip((length - t)/.08, 0, 1)
+    return (bright*a + dark*(1 - a)) * env * .12
+
+def snare(accent=False):
+    n = int(.25*SR); t = tt(n)
+    nz = band(rng.standard_normal(n), 1800, 8000) * np.exp(-t/(.07 if accent else .045))
+    body = np.sin(2*np.pi*190*t) * np.exp(-t/.03) * .6
+    return (nz + body) * (.5 if accent else .3)
+
+def bass_drum():
+    n = int(.4*SR); t = tt(n)
+    return np.sin(2*np.pi*np.cumsum(fcurve([(0, 110), (.08, 60), (.4, 50)], n))/SR) * np.exp(-t/.16) * .7
+
+FT_A = [[('F4',1),('A#4',1),('D5',1),('F5',1)], [('D5',2),('A#4',2)], [('C5',1),('D5',1),('D#5',1),('C5',1)], [('A4',2),('F4',2)],
+        [('G4',1),('A4',1),('A#4',1),('C5',1)], [('D5',2),('D#5',1),('D5',1)], [('C5',1),('A#4',1),('A4',1),('C5',1)], [('A#4',3),('-',1)]]
+FT_ACH = ['A#','A#','F','F','D#','A#','F','A#']
+FT_B = [[('D5',1),('D5',1),('D#5',1),('F5',1)], [('G5',2),('D#5',2)], [('F5',1),('D#5',1),('D5',1),('C5',1)], [('D5',2),('A#4',2)],
+        [('C5',1),('C5',1),('D5',1),('D#5',1)], [('F5',2),('D5',2)], [('D#5',1),('D5',1),('C5',1),('A4',1)], [('A#4',3),('-',1)]]
+FT_BCH = ['D#','D#','A#','A#','F','A#','F','A#']
+
+def firetruck_long(dur, shift=0):
+    BEAT = .5; BAR = 2*BEAT*2; E = BEAT     # 2 beats of 0.5 s = one 'half'; a phrase bar holds 4 eighth-ish steps of 0.5 s
+    tr = Track(dur)
+    CH = {'A#': ('A#1', ['D3','F3','A#3']), 'F': ('F1', ['C3','F3','A3']), 'D#': ('D#2', ['D#3','G3','A#3']), 'Gm': ('G1', ['D3','G3','A#3']), 'Cm': ('C2', ['C3','D#3','G3'])}
+    FIFTH = {'A#': 'F2', 'F': 'C2', 'D#': 'A#1', 'Gm': 'D2', 'Cm': 'G1'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(FT_A, FT_ACH), (FT_B, FT_BCH), (None, ['A#','Gm','Cm','F','A#','Gm','F','A#']), (FT_A, FT_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'A#'),(None,'F')] + body[:nb - 4] + [(FT_A[6], 'F'), ([('A#4',4)], 'A#')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch3 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch3]
+        if not fin:
+            # oom-pah: tuba root / fifth on the beats, brass chord stabs on the off-beats
+            for k in range(4):
+                if k % 2 == 0: tr.add(tuba(freq(root if k == 0 else FIFTH[ch], shift), .4), t0 + k*E, -.05, .55)
+                else:
+                    for f in fr: tr.add(brass(f, .22), t0 + k*E, .25, .11)
+            if bi >= 2:
+                tr.add(bass_drum(), t0, 0, .35); tr.add(bass_drum(), t0 + 2*E, 0, .2)
+                for k in range(4): tr.add(snare(k % 2 == 1), t0 + k*E, -.15, .11)
+                if bi % 4 == 3: [tr.add(snare(), t0 + 3*E + j*E/4, -.15, .06 + .02*j) for j in range(4)]   # little roll into the next phrase
+        else:
+            tr.add(tuba(freq(root, shift), 2.0), t0, 0, .55)
+            for f in fr: tr.add(brass(f, 1.8), t0, .25, .14)
+            tr.add(bass_drum(), t0, 0, .4)
+        if mel is None and not fin and bi >= 2:
+            tr.add(glock(fr[2]*4, .8), t0 + E, .35, .06); tr.add(glock(fr[1]*4, .8), t0 + 3*E, .35, .05)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = max(.3, ln*E*.9) + (1.2 if fin else 0)
+                    tr.add(brass(f, L), t0 + p*E, .05, .7)
+                    if ln == 1 and not fin: tr.add(glock(f*2, .5), t0 + p*E, .4, .035)
+                p += ln
+    return tr.buf
+
+# ---------- "10 Acorns for Squirrel" (learning counting #3): gentle 6/8 woodland jig in G – bassoon lead, marimba, pizzicato bass, woodblock ----------
+def bassoon(f, length):
+    """Warm, slightly nasal double-reed: strong 2nd/3rd partials, soft breathy onset, gentle vibrato."""
+    n = int(length*SR); t = tt(n)
+    vib = 1 + .004*np.sin(2*np.pi*5*t) * np.minimum(t/.3, 1)
+    ph = 2*np.pi*np.cumsum(f*vib)/SR
+    s = .6*np.sin(ph) + .9*np.sin(2*ph) + .55*np.sin(3*ph) + .3*np.sin(4*ph) + .15*np.sin(5*ph) + .08*np.sin(6*ph)
+    from scipy.signal import lfilter, butter
+    s = lfilter(*butter(2, min(4000, f*6)/(SR/2)), s) + band(rng.standard_normal(n), f*2, f*8) * .03
+    env = np.minimum(t/.05, 1) * np.clip((length - t)/.1, 0, 1)
+    return s * env * .2
+
+AC_A = [[('D4',2),('G4',1),('B4',2),('A4',1)], [('G4',3),('D4',3)], [('E4',2),('G4',1),('C5',2),('B4',1)], [('A4',6)],
+        [('B4',2),('C5',1),('D5',2),('B4',1)], [('C5',2),('A4',1),('E4',3)], [('D4',2),('F#4',1),('A4',2),('C5',1)], [('B4',3),('G4',3)]]
+AC_ACH = ['G','G','C','D','G','Am','D','G']
+AC_B = [[('B4',2),('A4',1),('G4',2),('B4',1)], [('A4',3),('E4',3)], [('C5',2),('B4',1),('A4',2),('C5',1)], [('B4',6)],
+        [('E5',2),('D5',1),('C5',2),('E5',1)], [('D5',2),('B4',1),('G4',3)], [('A4',2),('B4',1),('C5',2),('A4',1)], [('G4',6)]]
+AC_BCH = ['Em','Am','C','G','C','G','D','G']
+
+def acorns_long(dur, shift=0):
+    E = .25; BAR = 6*E
+    tr = Track(dur)
+    CH = {'G': ('G2', ['G3','B3','D4']), 'C': ('C3', ['G3','C4','E4']), 'D': ('D3', ['F#3','A3','D4']), 'Am': ('A2', ['A3','C4','E4']), 'Em': ('E2', ['G3','B3','E4'])}
+    FIFTH = {'G': 'D3', 'C': 'G2', 'D': 'A2', 'Am': 'E3', 'Em': 'B2'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(AC_A, AC_ACH), (AC_B, AC_BCH), (None, ['C','G','Am','D','Em','C','D','G']), (AC_A, AC_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'G'),(None,'D')] + body[:nb - 4] + [(AC_A[6], 'D'), ([('G4',6)], 'G')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch3 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch3]
+        if not fin:
+            tr.add(pizz(freq(root, shift), .5), t0, -.1, .55); tr.add(pizz(freq(FIFTH[ch], shift), .45), t0 + 3*E, -.1, .45)
+            for k in (1, 2, 4, 5):                                   # marimba chord pulses on the off-steps of each half bar
+                for f in fr: tr.add(marimba(f*2, .4), t0 + k*E, .3 if k < 3 else -.3, .07)
+            if bi >= 2:
+                tr.add(woodblock(1.0), t0, .45, .12); tr.add(woodblock(1.35), t0 + 3*E, -.45, .09)
+                if bi % 2: tr.add(shaker(), t0 + 5*E, .2, .12)
+        else:
+            tr.add(pizz(freq(root, shift), 1.5), t0, 0, .6)
+            for f in fr: tr.add(marimba(f*2, 2.0), t0, .2, .12)
+        if mel is None and not fin and bi >= 2:
+            tr.add(marimba(fr[2]*4, .6), t0, .5, .08); tr.add(marimba(fr[1]*4, .6), t0 + 3*E, -.5, .07)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = max(.25, ln*E*.92) + (1.2 if fin else 0)
+                    tr.add(bassoon(f, L), t0 + p*E, .05, .7)
+                p += ln
+    return tr.buf
