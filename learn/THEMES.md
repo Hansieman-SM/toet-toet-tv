@@ -11,7 +11,7 @@ Mark a theme as used with date + job name. Seasonal: autumn until ±Nov 30, wint
 | 4 | ABC | Animal ABC (B Boris/Buffalo, E Ella, L Leo, R Nico…) | The Big Four | 2026-11-11 learn-animal-abc (YT 2026-11-12 14:00) |
 | 5 | Can You Find It? | Colours: find the red/blue/yellow… thing on the road | Little Truck Toet | 2026-11-12 learn-can-you-find-it-colors (YT 2026-11-13 14:00) |
 | 6 | Counting | 10 Acorns for Squirrel (autumn forest) | Little Truck Toet | 2026-11-13 learn-10-acorns-for-squirrel (YT 2026-11-14 14:00) |
-| 7 | ABC | Food ABC picnic (A Apple, B Banana, C Carrot…) | The Big Four | |
+| 7 | ABC | Food ABC picnic (A Apple, B Banana, C Carrot…) | The Big Four | 2026-11-14 learn-food-abc-picnic (YT 2026-11-15 14:00) |
 | 8 | Counting | 10 Twinkling Stars at Bedtime | The Big Four | |
 | 9 | Can You Find It? | Shapes: circle, square, triangle, star hidden in the savanna | The Big Four | |
 | 10 | ABC | Vehicle ABC (A Ambulance, B Bus, C Crane, D Digger…) – ties in with "Helper Friends" | Little Truck Toet | |

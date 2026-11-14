@@ -25,6 +25,8 @@ elif kind == 'animalabc': music = animal_abc_long(dur, m.get('shift', 0))
 elif kind == 'findit': music = findit_long(dur, m.get('shift', 0))
 elif kind == 'firetruck': music = firetruck_long(dur, m.get('shift', 0))
 elif kind == 'acorns': music = acorns_long(dur, m.get('shift', 0))
+elif kind == 'bubbles': music = bubbles_long(dur, m.get('shift', 0))
+elif kind == 'foodabc': music = foodabc_long(dur, m.get('shift', 0))
 else: music = lullaby(dur)
 events = [(t, make(name), g, pan) for t, name, g, pan in info['events']]
 duck = [tuple(d) for d in info['duck']]

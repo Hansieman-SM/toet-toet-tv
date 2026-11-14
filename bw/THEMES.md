@@ -17,7 +17,7 @@ Title pattern: "<Theme> 🖤🤍 Black & White Baby Sensory | High Contrast for 
 | 10 | Little Vehicles | Little Truck Toet, bus, train, boat, plane, bicycle, tractor, helicopter, scooter, balloon | piano, musicbox, cello / none | 2026-11-12 bw-little-vehicles |
 | 11 | Shapes Dance | circle, square, triangle, star, heart, spiral, hexagon, checkerboard, stripes, dots | vibes, kalimba, piano / none | 2026-11-13 bw-shapes-dance |
 | 12 | Coral Reef | coral, clownfish-like fish, sea turtle, ray, eel, anemone, shell, sea snail, urchin, shrimp | harp, vibes, cello / sea | 2026-11-14 bw-coral-reef |
-| 13 | Jungle Night | sloth, toucan, frog, tiger cub, parrot, chameleon, snake (friendly), leaf, monkey, firefly | flute, guitar, cello / night | |
+| 13 | Jungle Night | sloth, toucan, frog, tiger cub, parrot, chameleon, snake (friendly), leaf, monkey, firefly | flute, guitar, cello / night | 2026-11-15 bw-jungle-night |
 | 14 | Rain and Clouds | cloud, raindrop, umbrella, rainbow arc, puddle, boots, duck, snail, sun, frog | piano, celesta, harp / rain | |
 | 15 | Pets | puppy, kitten, hamster, goldfish, parrot, bunny, turtle, ball, bone, mouse | guitar, musicbox, piano / none | |
 | 16 | Dinosaur Babies | friendly long-neck, horned dino, egg, baby dino, volcano (calm), fern, footprints, flying dino, stegosaur, tree | cello, kalimba, flute / wind | |

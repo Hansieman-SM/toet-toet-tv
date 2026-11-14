@@ -1286,3 +1286,121 @@ def acorns_long(dur, shift=0):
                     tr.add(bassoon(f, L), t0 + p*E, .05, .7)
                 p += ln
     return tr.buf
+
+# ---------- "Bubble Fun!" (episode en12, The Big Four): bouncy little toy-box polka in D, 2-feel at ~120 bpm –
+# soft 'glass' lead (round sine with a tiny upward bloop on each note), toy piano on the off-beats, pizzicato bass on the beats,
+# small water-drop 'bloop' percussion + shaker. The middle sections drop the lead for a lighter glockenspiel answer. ----------
+BU_A = [[('A4',1),('D5',1),('F#5',2),('E5',1),('D5',1),('E5',2)], [('F#5',1),('A5',1),('G5',1),('F#5',1),('E5',4)],
+        [('G4',1),('B4',1),('E5',2),('D5',1),('C#5',1),('D5',2)], [('E5',1),('F#5',1),('E5',1),('C#5',1),('A4',4)],
+        [('A4',1),('D5',1),('F#5',2),('A5',2),('B5',2)], [('A5',1),('G5',1),('F#5',1),('G5',1),('B5',4)],
+        [('A5',1),('F#5',1),('D5',1),('F#5',1),('E5',2),('C#5',2)], [('D5',4),('-',2),('A4',2)]]
+BU_ACH = ['D','A','G','A','D','G','A','D']
+BU_B = [[('B4',1),('C#5',1),('D5',2),('F#5',2),('D5',2)], [('E5',1),('F#5',1),('G5',2),('E5',4)],
+        [('C#5',1),('D5',1),('E5',2),('A5',2),('G5',2)], [('F#5',2),('E5',2),('D5',4)],
+        [('B4',1),('D5',1),('G5',2),('F#5',1),('E5',1),('D5',2)], [('C#5',1),('E5',1),('A5',2),('G5',2),('E5',2)],
+        [('F#5',1),('G5',1),('A5',2),('E5',2),('C#5',2)], [('D5',6),('-',2)]]
+BU_BCH = ['Bm','Em','A','D','G','A','A','D']
+
+def glass_lead(f, length):
+    """Round, bubbly lead: sine + soft 2nd partial, each note starts a few cents low and 'bloops' up; light fast vibrato."""
+    n = int(length*SR); t = tt(n)
+    bend = 1 - .03*np.exp(-t/.035)
+    vib = 1 + .006*np.sin(2*np.pi*6.5*t) * np.clip((t - .15)/.2, 0, 1)
+    ph = 2*np.pi*np.cumsum(f*bend*vib)/SR
+    s = np.sin(ph) + .22*np.sin(2*ph) + .06*np.sin(3*ph)
+    env = np.minimum(t/.015, 1) * np.exp(-t/max(.4, length*1.2)) * np.clip((length - t)/.06, 0, 1)
+    return s * env * .5
+
+def bloop(pitch=1.0):
+    n = int(.14*SR); t = tt(n)
+    return np.sin(2*np.pi*np.cumsum(500*pitch + 900*pitch*(t/.14))/SR) * np.exp(-t/.035) * .6
+
+def bubbles_long(dur, shift=0):
+    E = .25; BAR = 8*E
+    tr = Track(dur)
+    CH = {'D': ('D3', ['F#3','A3','D4']), 'A': ('A2', ['E3','A3','C#4']), 'G': ('G2', ['G3','B3','D4']), 'Bm': ('B2', ['F#3','B3','D4']), 'Em': ('E3', ['G3','B3','E4'])}
+    FIFTH = {'D': 'A2', 'A': 'E3', 'G': 'D3', 'Bm': 'F#3', 'Em': 'B2'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(BU_A, BU_ACH), (BU_B, BU_BCH), (None, ['G','D','A','D','G','D','Em','A']), (BU_A, BU_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'D'),(None,'A')] + body[:nb - 4] + [(BU_A[6], 'A'), ([('D5',8)], 'D')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch3 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch3]
+        if not fin:
+            for b, nn in ((0, root), (4, FIFTH[ch])): tr.add(pizz(freq(nn, shift), .4), t0 + b*E, -.15, .55)
+            for b in (2, 6):
+                for f in fr: tr.add(toypiano(f*2, .3), t0 + b*E, .3, .09)
+            if bi >= 2:
+                tr.add(bloop(1.0), t0 + 3*E, .4, .1); tr.add(bloop(1.3), t0 + 7*E, -.4, .08)
+                for k in (1, 3, 5, 7): tr.add(shaker(), t0 + k*E, .15, .07)
+        else:
+            tr.add(pizz(freq(root, shift), 1.5), t0, 0, .6)
+            for f in fr: tr.add(toypiano(f*2, 2.0), t0, .2, .14)
+        if mel is None and not fin and bi >= 2:
+            for k, nn in enumerate([ch3[2], ch3[1], ch3[2], ch3[0]]): tr.add(glock(freq(nn, shift)*4, .5), t0 + k*2*E + E, .35, .08)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = max(.22, ln*E*.95) + (1.4 if fin else 0)
+                    tr.add(glass_lead(f, L), t0 + p*E, .05, .6)
+                p += ln
+    return tr.buf
+
+# ---------- "Food ABC Picnic" (learning #7, The Big Four): easy, sunny swing in B-flat, ~100 bpm –
+# soft muted-trumpet lead (cup-mute: nasal, buzzy, gentle), electric-piano comp on 2 and 4, walking upright bass (pizz),
+# brushes + a soft cowbell tap. The middle sections leave out the lead so the letter lines stay clear. ----------
+FA_A = [[('D5',2),('F5',1),('G5',1),('A#5',2),('A5',2)], [('G5',3),('F5',1),('D5',4)], [('C5',2),('D#5',1),('F5',1),('G5',2),('F5',2)], [('D5',6),('-',2)],
+        [('D5',2),('F5',1),('A#5',1),('D6',2),('C6',2)], [('A#5',2),('G5',2),('D#5',4)], [('F5',2),('G5',1),('F5',1),('D5',2),('C5',2)], [('A#4',6),('-',2)]]
+FA_ACH = ['A#','Gm','Cm','F','A#','D#','F','A#']
+FA_B = [[('F5',2),('G5',2),('A5',2),('A#5',2)], [('C6',3),('A#5',1),('G5',4)], [('D#5',2),('F5',2),('G5',2),('A#5',2)], [('A5',6),('-',2)],
+        [('A#5',2),('A5',2),('G5',2),('F5',2)], [('D#5',3),('D5',1),('C5',4)], [('D5',2),('F5',2),('A5',2),('C6',2)], [('A#5',6),('-',2)]]
+FA_BCH = ['D#','Cm','D#','F','Gm','Cm','F','A#']
+
+def muted_trumpet(f, length):
+    n = int(length*SR); t = tt(n)
+    vib = 1 + .005*np.sin(2*np.pi*5.2*t) * np.clip((t - .18)/.25, 0, 1)
+    ph = 2*np.pi*np.cumsum(f*vib)/SR
+    s = sum(np.sin(k*ph) / k**.7 for k in range(1, 9))
+    from scipy.signal import lfilter, butter
+    s = lfilter(*butter(2, [min(f*1.5, 6000)/(SR/2), min(f*7, 15000)/(SR/2)], btype='band'), s)
+    env = np.minimum(t/.03, 1) * (1 - .25*np.minimum(t/.4, 1)) * np.clip((length - t)/.08, 0, 1)
+    return s * env * .5
+
+def cowbell_soft():
+    n = int(.25*SR); t = tt(n)
+    return (np.sin(2*np.pi*560*t) + .6*np.sin(2*np.pi*835*t)) * np.exp(-t/.06) * .4
+
+def foodabc_long(dur, shift=0):
+    BEAT = .6; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'A#': ('A#2', ['D3','F3','A3']), 'Gm': ('G2', ['D3','F3','A#3']), 'Cm': ('C3', ['D#3','G3','A#3']), 'F': ('F2', ['D#3','A3','C4']), 'D#': ('D#2', ['D3','G3','A#3'])}
+    WALK = {'A#': ['A#2','D3','F3','A2'], 'Gm': ['G2','A#2','D3','F#2'], 'Cm': ['C3','D#3','G2','E2'], 'F': ['F2','A2','C3','E2'], 'D#': ['D#2','G2','A#2','A2']}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(FA_A, FA_ACH), (None, ['A#','Gm','Cm','F','D#','F','A#','F']), (FA_B, FA_BCH), (None, ['A#','Gm','Cm','F','A#','D#','F','A#'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'A#'),(None,'F')] + body[:nb - 4] + [(FA_A[6], 'F'), ([('A#4',8)], 'A#')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch3 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch3]
+        if not fin:
+            for b, nn in enumerate(WALK[ch]): tr.add(pizz(freq(nn, shift), .5), t0 + b*BEAT, -.1, .5)
+            for b in (1, 3): tr.add(epiano(fr, .35), t0 + b*BEAT + (.06 if b == 3 else 0), .3, .35)
+            if bi >= 2:
+                for k in range(8): tr.add(brush_hit(), t0 + k*E + (.05 if k % 2 else 0), .2, .05 if k % 2 else .08)
+                if bi % 2 == 0: tr.add(cowbell_soft(), t0 + 3*BEAT + E + .05, .45, .06)
+        else:
+            tr.add(pizz(freq(root, shift), 1.6), t0, 0, .6); tr.add(epiano(fr, 2.0), t0, .3, .4)
+        if mel is None and not fin and bi >= 2:
+            tr.add(vibes([fr[2]*2], .8), t0 + E, .35, .12); tr.add(vibes([fr[1]*2], .8), t0 + 2*BEAT + E, -.35, .1)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = max(.3, ln*E*.95) + (1.2 if fin else 0)
+                    tr.add(muted_trumpet(f, L), t0 + p*E + (.04 if p % 2 else 0), .05, .55)
+                p += ln
+    return tr.buf
