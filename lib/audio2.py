@@ -1404,3 +1404,56 @@ def foodabc_long(dur, shift=0):
                     tr.add(muted_trumpet(f, L), t0 + p*E + (.04 if p % 2 else 0), .05, .55)
                 p += ln
     return tr.buf
+
+# ---------- "10 Twinkling Stars" (learning counting #4, The Big Four, bedtime): slow French-horn lullaby in F, 6/8 (~67 bpm dotted) –
+# warm horn lead, nylon-guitar arpeggios on every eighth, soft bass on 1 and 4, a quiet string pad under the B-section,
+# a triangle ping every second bar. No drums: calm and sleepy. The middle sections leave out the horn (guitar + celesta answers). ----------
+ST_A = [[('C5',2),('A4',1),('F4',2),('A4',1)], [('G4',3),('C4',3)], [('D4',2),('F4',1),('A#4',2),('A4',1)], [('G4',6)],
+        [('C5',2),('D5',1),('C5',2),('A4',1)], [('A#4',2),('G4',1),('E4',3)], [('F4',2),('G4',1),('A4',2),('G4',1)], [('F4',6)]]
+ST_ACH = ['F','C','A#','C','F','C','A#','F']
+ST_B = [[('A4',2),('C5',1),('F5',2),('E5',1)], [('D5',3),('A4',3)], [('A#4',2),('D5',1),('G5',2),('F5',1)], [('E5',6)],
+        [('F5',2),('E5',1),('D5',2),('C5',1)], [('A#4',2),('A4',1),('G4',3)], [('A4',2),('A#4',1),('G4',2),('E4',1)], [('F4',6)]]
+ST_BCH = ['F','Dm','Gm','C','Dm','Gm','C','F']
+
+def french_horn(f, length):
+    """Round, mellow horn: soft swell, strong fundamental, few upper partials (low-passed), slow gentle vibrato."""
+    n = int(length*SR); t = tt(n)
+    vib = 1 + .003*np.sin(2*np.pi*4.6*t) * np.clip((t - .25)/.3, 0, 1)
+    ph = 2*np.pi*np.cumsum(f*vib)/SR
+    s = np.sin(ph) + .55*np.sin(2*ph) + .3*np.sin(3*ph) + .14*np.sin(4*ph) + .06*np.sin(5*ph)
+    from scipy.signal import lfilter, butter
+    s = lfilter(*butter(2, min(f*4.5, 3500)/(SR/2)), s)
+    env = np.minimum(t/.09, 1)**1.5 * (1 - .15*np.minimum(t/.8, 1)) * np.clip((length - t)/.15, 0, 1)
+    return s * env * .45
+
+def stars_long(dur, shift=0):
+    E = .3; BAR = 6*E
+    tr = Track(dur)
+    CH = {'F': ('F2', ['F3','A3','C4']), 'C': ('C2', ['G3','C4','E4']), 'A#': ('A#1', ['F3','A#3','D4']), 'Dm': ('D2', ['F3','A3','D4']), 'Gm': ('G2', ['G3','A#3','D4'])}
+    FIFTH = {'F': 'C3', 'C': 'G2', 'A#': 'F2', 'Dm': 'A2', 'Gm': 'D3'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(ST_A, ST_ACH), (None, ['F','Dm','A#','C','F','Gm','C','F']), (ST_B, ST_BCH), (ST_A, ST_ACH), (None, ['A#','F','Gm','C','Dm','A#','C','F'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 5]; body += [(mm, cc, m is ST_B) for mm, cc in zip(m if m else [None]*8, c)]; i += 1
+    song = [(None,'F',False),(None,'C',False)] + body[:nb - 4] + [(ST_A[6], 'A#', False), ([('F4',6)], 'F', False)]
+    last = len(song) - 1
+    for bi, (mel, ch, pad) in enumerate(song):
+        t0 = bi*BAR; root, ch3 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch3]
+        if not fin:
+            tr.add(soft_bass(freq(root, shift), 1.0), t0, -.05, .45); tr.add(soft_bass(freq(FIFTH[ch], shift), .8), t0 + 3*E, -.05, .3)
+            for k, idx in enumerate([0, 1, 2, 1, 2, 1]): tr.add(nylon([fr[idx]], .7), t0 + k*E, -.3 if k % 2 else .3, .32 if k == 0 else .24)
+            if pad: tr.add(string_pad(fr, BAR + .3), t0, 0, .5)
+            if bi % 2 == 0 and bi >= 2: tr.add(triangle_ping(), t0, .5, .05)
+        else:
+            tr.add(soft_bass(freq(root, shift), 2.5), t0, 0, .5); tr.add(nylon(fr, 3.0), t0, 0, .45); tr.add(string_pad(fr, 3.0), t0, 0, .5)
+            tr.add(triangle_ping(), t0 + .05, .4, .06)
+        if mel is None and not fin and bi >= 2:
+            tr.add(celesta(fr[2]*2, 1.2), t0 + 2*E, .4, .1); tr.add(celesta(fr[1]*2, 1.2), t0 + 5*E, -.4, .08)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = max(.3, ln*E*.97) + (1.5 if fin else .05)
+                    tr.add(french_horn(f, L), t0 + p*E, .05, .62)
+                p += ln
+    return tr.buf
