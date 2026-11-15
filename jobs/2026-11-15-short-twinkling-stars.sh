@@ -1,6 +1,7 @@
 #!/bin/bash
 # Short: 10 Twinkling Stars – "Ten twinkling stars!", a shooting star, count 1–10 again, the moon rises, "Good night, stars!" and The Big Four
 # fall asleep (from ep/learn08_stars.js, 84.3–121.6 s, full 16:9 frame – contains text + speech bubbles, so no crop)
+# rev2: crescent moon drawn as a clean crescent and rising in the middle of the sky (no overlap with stars or speech bubbles)
 set -e; S=2026-11-15-short-twinkling-stars; O=release/$S; mkdir -p $O
 python3 ep/mix.py ep/learn08_stars.js $O/audio.wav
 OW=2560 OH=1440 node ep/learn08_stars.js | ffmpeg -v error -y -f rawvideo -pix_fmt rgba -s 2560x1440 -r 30 -i - -i $O/audio.wav -c:v libx264 -preset slow -tune animation -crf 12 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest $O/full.mp4

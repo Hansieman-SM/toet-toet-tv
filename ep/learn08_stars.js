@@ -131,8 +131,8 @@ function moon(cx, cy, a) {
   x.save(); x.globalAlpha = a;
   const gr = x.createRadialGradient(cx, cy, 20, cx, cy, 110); gr.addColorStop(0, 'rgba(255,248,220,.35)'); gr.addColorStop(1, 'rgba(255,248,220,0)');
   x.fillStyle = gr; x.beginPath(); x.arc(cx, cy, 110, 0, 7); x.fill();
-  x.beginPath(); x.arc(cx, cy, 46, 0, 7); x.arc(cx + 22, cy - 12, 40, 0, 7, true); x.fillStyle = '#fff3c4'; x.fill('evenodd');
-  x.strokeStyle = INK; x.lineWidth = 3; x.beginPath(); x.arc(cx, cy, 46, .2, 4.9); x.stroke();
+  x.beginPath(); x.arc(cx, cy, 46, .552, 4.733); x.arc(cx + 22, cy - 12, 40, 4.159, 1.126, true); x.closePath();
+  x.fillStyle = '#fff3c4'; x.fill(); x.strokeStyle = INK; x.lineWidth = 3; x.lineJoin = 'round'; x.stroke();
   // sleepy face on the crescent
   x.strokeStyle = INK; x.lineWidth = 2.2; x.lineCap = 'round'; x.beginPath(); x.arc(cx - 24, cy - 2, 4, .2, Math.PI - .2); x.stroke();
   x.beginPath(); x.arc(cx - 20, cy + 16, 5, .3, Math.PI - .6); x.stroke();
@@ -250,9 +250,9 @@ St.episode({
     // 5 – the moon rises, "Good night, stars!" – the friends fall asleep and the stars close their eyes too
     { d: 17, draw: (u, c) => {
         night(c.t, 1);
-        moon(lerp(820, 800, ease(u / 6)), lerp(250, 140, ease(u / 6)), clamp(u / 2.5));
         const asleep = u > 7.4;
         friends(c, { sleep: asleep }); nightTint(1); front(c.t, 1);
+        moon(lerp(565, 480, ease(u / 6)), lerp(275, 192, ease(u / 6)), clamp(u / 2.5));
         for (let j = 0; j < 10; j++) skyStar(j, c.t, 1, { sleep: u > 9 + j * .25 });
         if (asleep) ORDER.forEach((k, j) => zzz(c.t, k, clamp((u - 8 - j * .4) / 1)));
       },

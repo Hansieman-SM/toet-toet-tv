@@ -4,6 +4,7 @@
 # chime; the sky gets darker, Boris and Leo yawn; TEN!, gentle shooting star, recap 1–10, the moon rises, "Good night, stars!", the friends fall
 # asleep (z z z) and the stars close their eyes; new music stars_long: French-horn lullaby in F 6/8 – nylon-guitar arpeggios, soft bass,
 # string pad, triangle, no drums)
+# rev2: crescent moon drawn as a clean crescent and rising in the middle of the sky (no overlap with stars or speech bubbles)
 set -e; S=2026-11-15-learn-10-twinkling-stars; O=release/$S; mkdir -p $O
 python3 ep/mix.py ep/learn08_stars.js $O/audio.wav
 SUBSCRIBE=1 OW=2560 OH=1440 node ep/learn08_stars.js | ffmpeg -v error -y -f rawvideo -pix_fmt rgba -s 2560x1440 -r 30 -i - -i $O/audio.wav -c:v libx264 -preset slow -tune animation -crf 16 -pix_fmt yuv420p -c:a aac -b:a 192k -movflags +faststart -shortest $O/$S.mp4
