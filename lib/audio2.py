@@ -1457,3 +1457,81 @@ def stars_long(dur, shift=0):
                     tr.add(french_horn(f, L), t0 + p*E, .05, .62)
                 p += ln
     return tr.buf
+
+# ---------- "Can You Find It? Shapes" (learning #9, The Big Four, savanna): gentle highlife lilt in E major, 4/4 ~104 bpm –
+# soft oboe lead (double-reed: nasal, warm, light vibrato), hammered-dulcimer arpeggios (struck strings, bright shimmer, light chorus),
+# plucked upright bass on 1 and the 'and' of 2 (highlife bass figure), udu clay-pot 'bloop' on 2 and 4 + a soft shaker on the eighths.
+# The middle 'thinking' sections drop the oboe so the 3-dot pauses stay quiet (dulcimer + a few soft udu taps only). ----------
+SH_A = [[('B4',2),('E5',2),('G#5',3),('F#5',1)], [('E5',2),('C#5',2),('B4',4)], [('A4',2),('C#5',2),('E5',2),('F#5',2)], [('G#5',3),('F#5',1),('E5',2),('-',2)],
+        [('B4',2),('E5',2),('G#5',2),('B5',2)], [('A5',3),('G#5',1),('F#5',4)], [('E5',2),('F#5',2),('G#5',2),('D#5',2)], [('E5',6),('-',2)]]
+SH_ACH = ['E','C#m','A','E','E','F#m','B','E']
+SH_B = [[('C#5',2),('E5',2),('A5',4)], [('G#5',2),('E5',2),('B4',4)], [('A4',2),('B4',2),('C#5',2),('E5',2)], [('F#5',6),('-',2)],
+        [('G#5',2),('F#5',2),('E5',2),('G#5',2)], [('A5',3),('F#5',1),('C#5',4)], [('B4',2),('D#5',2),('F#5',2),('A5',2)], [('G#5',6),('-',2)]]
+SH_BCH = ['A','E','A','B','E','F#m','B','E']
+
+def oboe(f, length):
+    """Soft double-reed tone: strong 2nd-4th partials (nasal), gentle formant, slow vibrato fading in, breathy onset."""
+    n = int(length*SR); t = tt(n)
+    vib = 1 + .005*np.sin(2*np.pi*5.4*t) * np.clip((t - .15)/.35, 0, 1)
+    ph = 2*np.pi*np.cumsum(f*vib)/SR
+    s = .7*np.sin(ph) + .9*np.sin(2*ph) + .65*np.sin(3*ph) + .45*np.sin(4*ph) + .2*np.sin(5*ph) + .1*np.sin(6*ph)
+    s += band(rng.standard_normal(n), f*2, min(f*8, 9000)) * .04 * np.exp(-t/.08)
+    from scipy.signal import lfilter, butter
+    s = lfilter(*butter(2, min(f*5, 4200)/(SR/2)), s)
+    env = np.minimum(t/.06, 1) * np.clip((length - t)/.1, 0, 1) * (1 - .12*np.minimum(t/.6, 1))
+    return s * env * .22
+
+def dulcimer(f, length=.9):
+    """Hammered dulcimer: a pair of slightly detuned struck strings, bright inharmonic-ish partials decaying fast, soft hammer thump."""
+    n = int(length*SR); t = tt(n); out = np.zeros(n)
+    for det in (1.0, 1.0035):
+        for k in range(1, 7):
+            out += np.sin(2*np.pi*f*det*k*(1 + .0006*k*k)*t) * np.exp(-t*(2.2 + k*1.6)) / k**1.1
+    out += band(rng.standard_normal(n), 800, 3000) * np.exp(-t/.006) * .3
+    return out * np.minimum(t/.0015, 1) * .2
+
+def udu(pitch=1.0):
+    """Clay-pot drum: a soft low 'bloop' with a quick downward pitch bend."""
+    n = int(.35*SR); t = tt(n)
+    f = 180*pitch*(1 + .5*np.exp(-t/.03))
+    return np.sin(2*np.pi*np.cumsum(f)/SR) * np.exp(-t/.11) * np.minimum(t/.004, 1) * .5
+
+def shapehunt_long(dur, shift=0):
+    BEAT = .577; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'E': ('E2', ['E4','G#4','B4']), 'A': ('A1', ['E4','A4','C#5']), 'B': ('B1', ['D#4','F#4','B4']), 'C#m': ('C#2', ['E4','G#4','C#5']),
+          'F#m': ('F#1', ['F#4','A4','C#5'])}
+    FIFTH = {'E': 'B1', 'A': 'E2', 'B': 'F#2', 'C#m': 'G#1', 'F#m': 'C#2'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(SH_A, SH_ACH), (None, ['E','C#m','A','B','E','A','F#m','B']), (SH_B, SH_BCH), (None, ['A','E','F#m','B','C#m','A','B','E'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'E'),(None,'B')] + body[:nb - 4] + [(SH_A[6], 'B'), ([('E5',8)], 'E')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch3 = CH[ch]; fin = bi == last; fr = [freq(n, shift) for n in ch3]
+        quiet = mel is None
+        if not fin:
+            # highlife bass figure: 1, and-of-2, 3 (fifth), 4
+            for pos, nm, g in [(0, root, .55), (3, root, .4), (4, FIFTH[ch], .45), (6, root, .35)]:
+                tr.add(pizz(freq(nm, shift), .5), t0 + pos*E, -.05, g)
+            # dulcimer: rolling arpeggio on the eighths (lighter in the quiet sections)
+            pat = [0, 1, 2, 1, 0, 2, 1, 2]
+            for k, j in enumerate(pat):
+                tr.add(dulcimer(fr[j], .9), t0 + k*E, .35 if k % 2 else -.25, (.2 if k % 2 else .26) * (.8 if quiet else 1))
+            if bi >= 2:
+                for b in (1, 3): tr.add(udu(1.0 if b == 1 else 1.25), t0 + b*BEAT, -.3, .16 if quiet else .22)
+                if not quiet:
+                    for k in range(8): tr.add(shaker(), t0 + k*E, .45, .05 if k % 2 else .08)
+        else:
+            tr.add(pizz(freq(root, shift), 1.5), t0, 0, .55)
+            for f in fr: tr.add(dulcimer(f, 2.5), t0, 0, .3)
+            tr.add(udu(1.0), t0, -.3, .2)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = max(.35, ln*E*.95) + (1.4 if fin else 0)
+                    tr.add(oboe(f, L), t0 + p*E, .08, .55)
+                p += ln
+    return tr.buf
