@@ -1535,3 +1535,75 @@ def shapehunt_long(dur, shift=0):
                     tr.add(oboe(f, L), t0 + p*E, .08, .55)
                 p += ln
     return tr.buf
+
+# ---------- "Vehicle ABC" (learning ABC #4, Little Truck Toet in town): happy little town-drive in D major, 4/4 ~100 bpm –
+# melodica lead (free reed: two slightly detuned reeds, bright but low-passed), ukulele down-up strums (Karplus-Strong plucks),
+# boom-chick upright bass (root on 1, fifth on 3), woodblock 'clip-clop' on the off-beats + soft brushes from bar 3.
+# Every other 8-bar section leaves out the melodica (ukulele + a few glockenspiel answers) so Toet's letters stay clear. ----------
+VA_A = [[('F#5',2),('A5',2),('D6',3),('B5',1)], [('A5',2),('F#5',2),('E5',4)], [('G5',2),('B5',2),('E5',2),('G5',2)], [('F#5',6),('-',2)],
+        [('D5',2),('F#5',2),('A5',2),('D6',2)], [('C#6',3),('B5',1),('A5',4)], [('G5',2),('E5',2),('C#5',2),('E5',2)], [('D5',6),('-',2)]]
+VA_ACH = ['D','D','G','D','D','A','A','D']
+VA_B = [[('B5',2),('A5',2),('G5',2),('B5',2)], [('A5',3),('F#5',1),('D5',4)], [('E5',2),('G5',2),('B5',2),('G5',2)], [('A5',6),('-',2)],
+        [('D6',2),('C#6',2),('B5',2),('A5',2)], [('G5',3),('B5',1),('F#5',4)], [('E5',2),('F#5',2),('G5',2),('C#5',2)], [('D5',6),('-',2)]]
+VA_BCH = ['G','D','Em','A','D','G','A','D']
+
+def melodica(f, length):
+    n = int(length*SR); t = tt(n); s = np.zeros(n)
+    for det in (1.0, 1.003):
+        ph = 2*np.pi*f*det*t
+        s += sum(np.sin(k*ph) * (1/k if k % 2 else .55/k) for k in range(1, 10))
+    s += band(rng.standard_normal(n), f, min(f*6, 9000)) * .05 * np.exp(-t/.06)
+    from scipy.signal import lfilter, butter
+    s = lfilter(*butter(2, min(f*4, 5000)/(SR/2)), s)
+    env = np.minimum(t/.025, 1) * (1 - .18*np.minimum(t/.5, 1)) * np.clip((length - t)/.06, 0, 1)
+    return s * env * .16
+
+def uke(freqs, length=.5, up=False):
+    """Ukulele strum: Karplus-Strong plucked nylon strings, a few ms apart (down or up stroke)."""
+    n = int(length*SR); out = np.zeros(n)
+    order = list(freqs)[::-1] if up else list(freqs)
+    for i, f in enumerate(order):
+        p = max(2, int(SR/f)); buf = rng.uniform(-1, 1, p); y = np.zeros(n)
+        for k in range(n):
+            y[k] = buf[k % p]; buf[k % p] = .5*(buf[k % p] + buf[(k+1) % p]) * .994
+        j = int(i*.012*SR); seg = y[:n-j]; out[j:] += seg * (.8 if up else 1)
+    return out * np.clip((length - tt(n))/.05, 0, 1) * .22
+
+def vehicleabc_long(dur, shift=0):
+    BEAT = .6; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'D': ('D2', ['D4','F#4','A4','D5']), 'G': ('G2', ['D4','G4','B4','D5']), 'A': ('A2', ['C#4','E4','A4','C#5']), 'Em': ('E2', ['E4','G4','B4','E5'])}
+    FIFTH = {'D': 'A2', 'G': 'D3', 'A': 'E2', 'Em': 'B2'}
+    cache = {}
+    def strum(ch, up, L):
+        key = (ch, up, L)
+        if key not in cache: cache[key] = uke([freq(nn, shift) for nn in CH[ch][1]], L, up)
+        return cache[key]
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(VA_A, VA_ACH), (None, ['D','G','A','D','G','D','A','D']), (VA_B, VA_BCH), (None, ['G','D','Em','A','D','G','A','D'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'D'),(None,'A')] + body[:nb - 4] + [(VA_A[6], 'A'), ([('D5',8)], 'D')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, ch4 = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in ch4]
+        if not fin:
+            tr.add(pizz(freq(root, shift), .5), t0, -.1, .55); tr.add(pizz(freq(FIFTH[ch], shift), .5), t0 + 2*BEAT, -.1, .45)
+            # strum pattern: D . D U . U D U
+            for pos, up in [(0, False), (2, False), (3, True), (5, True), (6, False), (7, True)]:
+                tr.add(strum(ch, up, .55), t0 + pos*E, .3 if up else -.25, .3 if pos in (0, 2) else .22)
+            if bi >= 2:
+                for b in (1, 3): tr.add(woodblock(1.0 if b == 1 else 1.18), t0 + b*BEAT + E, .45, .08)
+                for k in range(8): tr.add(brush_hit(), t0 + k*E, -.2, .04 if k % 2 else .06)
+        else:
+            tr.add(pizz(freq(root, shift), 1.6), t0, 0, .6); tr.add(uke(fr, 2.5), t0, 0, .45)
+        if mel is None and not fin and bi >= 2:
+            tr.add(vibes([fr[2]*2], .8), t0 + E, .35, .1); tr.add(vibes([fr[1]*2], .8), t0 + 2*BEAT + E, -.35, .08)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = max(.3, ln*E*.92) + (1.2 if fin else 0)
+                    tr.add(melodica(f, L), t0 + p*E + (.03 if p % 2 else 0), .1, .5)
+                p += ln
+    return tr.buf
