@@ -21,7 +21,7 @@ Title pattern: "<Theme> 🖤🤍 Black & White Baby Sensory | High Contrast for 
 | 14 | Rain and Clouds | cloud, raindrop, umbrella, rainbow arc, puddle, boots, duck, snail, sun, frog | piano, celesta, harp / rain | 2026-11-16 bw-rain-and-clouds |
 | 15 | Pets | puppy, kitten, hamster, goldfish, parrot, bunny, turtle, ball, bone, mouse | guitar, musicbox, piano / none | 2026-11-16 bw-pets (title "Pet Friends") |
 | 16 | Dinosaur Babies | friendly long-neck, horned dino, egg, baby dino, volcano (calm), fern, footprints, flying dino, stegosaur, tree | cello, kalimba, flute / wind | 2026-11-19 bw-dinosaur-babies |
-| 17 | Music Toys | drum, xylophone, bell, trumpet, piano keys, guitar, maracas, music notes, rattle, harp | the matching instruments, musicbox / none | |
+| 17 | Music Toys | drum, xylophone, bell, trumpet, piano keys, guitar, maracas, music notes, rattle, harp | the matching instruments, musicbox / none | 2026-11-20 bw-music-toys |
 | 18 | Flowers Bloom | tulip, daisy, rose, sunflower, bud opening, watering can, bee, leaf, pot, seed | harp, piano, flute / forest | |
 | 19 | Birds | owl, robin, swan, stork, penguin, parrot, nest, egg, feather, birdhouse | flute, celesta, guitar / forest | |
 | 20 | Bath Time | rubber duck, bubbles, soap, boat, towel, whale toy, sponge, bathtub, octopus toy, star | kalimba, vibes, harp / none | |
