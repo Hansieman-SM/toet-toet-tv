@@ -1607,3 +1607,134 @@ def vehicleabc_long(dur, shift=0):
                     tr.add(melodica(f, L), t0 + p*E + (.03 if p % 2 else 0), .1, .5)
                 p += ln
     return tr.buf
+
+# ---------- "Dottie the Digger" (episode en13): folk stomp in A, 4/4 ~120 bpm – mandolin lead (tremolo on long notes), upright bass,
+# ---------- felt-piano off-beat chords, cajón (low thump + slap), foot stomps on 1/3, soft claps on 4 ----------
+DG_A = [[('E5',1),('A5',1),('C#6',2),('B5',1),('A5',1),('F#5',2)], [('E5',2),('C#5',1),('E5',1),('A5',4)],
+        [('D5',1),('F#5',1),('A5',2),('B5',1),('A5',1),('F#5',2)], [('E5',2),('G#5',1),('A5',1),('B5',4)],
+        [('C#6',1),('B5',1),('A5',1),('C#6',1),('E6',2),('C#6',2)], [('D6',2),('B5',1),('A5',1),('F#5',4)],
+        [('E5',1),('F#5',1),('A5',1),('B5',1),('C#6',2),('B5',2)], [('A5',6),('-',2)]]
+DG_ACH = ['A','A','D','E','A','D','E','A']
+DG_B = [[('F#5',2),('A5',2),('C#6',2),('A5',2)], [('B5',3),('A5',1),('F#5',4)], [('D5',2),('F#5',2),('A5',2),('D6',2)], [('C#6',3),('B5',1),('A5',4)],
+        [('F#5',1),('G#5',1),('A5',2),('C#6',2),('E6',2)], [('D6',2),('C#6',2),('B5',4)], [('A5',1),('B5',1),('C#6',1),('B5',1),('A5',2),('G#5',2)], [('A5',4),('E5',2),('A5',2)]]
+DG_BCH = ['F#m','F#m','D','A','F#m','D','E','A']
+
+def mandolin(f, length):
+    """Bright double-course pluck; long notes get a tremolo (repeated picks)."""
+    n = int(length*SR); out = np.zeros(n)
+    step = .075 if length > .55 else length
+    k = 0
+    while k*step < length - .02:
+        m = int(min(.6, length - k*step)*SR); t = tt(m); g = 1.0 if k == 0 else .55
+        s = sum((np.sin(2*np.pi*f*h*t) + np.sin(2*np.pi*f*1.0025*h*t)) * np.exp(-t*(5 + h*2.5)) / h for h in range(1, 7))
+        s *= np.minimum(t/.002, 1); i = int(k*step*SR); out[i:i+m] += s[:n-i] * g; k += 1
+    return out * np.clip((length - tt(n))/.04, 0, 1) * .16
+
+def felt_chord(freqs, length=.3):
+    n = int(length*SR); t = tt(n)
+    return sum(np.sin(2*np.pi*f*t) + .25*np.sin(4*np.pi*f*t)*np.exp(-t/.08) for f in freqs) * np.exp(-t/.25) * np.minimum(t/.004, 1) * np.clip((length - t)/.03, 0, 1) / len(freqs)
+
+def cajon(slap=False):
+    n = int(.3*SR); t = tt(n)
+    if slap: return band(rng.standard_normal(n), 900, 5000) * np.exp(-t/.04) * .5 + np.sin(2*np.pi*190*t) * np.exp(-t/.05) * .3
+    return np.sin(2*np.pi*np.cumsum(70 + 50*np.exp(-t/.02))/SR) * np.exp(-t/.12) + band(rng.standard_normal(n), 100, 600) * np.exp(-t/.02) * .3
+
+def stomp():
+    n = int(.35*SR); t = tt(n)
+    return np.sin(2*np.pi*np.cumsum(55 + 30*np.exp(-t/.03))/SR) * np.exp(-t/.1) * .8 + band(rng.standard_normal(n), 200, 1800) * np.exp(-t/.025) * .35
+
+def digger_long(dur, shift=0):
+    BEAT = .5; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'A': ('A2', ['C#4','E4','A4']), 'D': ('D3', ['D4','F#4','A4']), 'E': ('E2', ['B3','E4','G#4']), 'F#m': ('F#2', ['C#4','F#4','A4'])}
+    FIFTH = {'A': 'E3', 'D': 'A2', 'E': 'B2', 'F#m': 'C#3'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(DG_A, DG_ACH), (DG_B, DG_BCH), (DG_A, DG_ACH), (None, ['D','A','E','A','F#m','D','E','E'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'A'),(None,'E')] + body[:nb - 4] + [(DG_A[6], 'E'), ([('A5',8)], 'A')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in tri]
+        if not fin:
+            for b, nn in enumerate([root, FIFTH[ch], root, FIFTH[ch]]): tr.add(pizz(freq(nn, shift), .45), t0 + b*BEAT, -.05, .6)
+            for b in range(4): tr.add(felt_chord(fr, .28), t0 + b*BEAT + E, -.3, .32)
+            if bi >= 2:
+                for b in (0, 2): tr.add(stomp(), t0 + b*BEAT, 0, .28)
+                for p in (0, 3, 4): tr.add(cajon(), t0 + p*E, .1, .24)
+                for p in (2, 6): tr.add(cajon(True), t0 + p*E, .2, .3)
+                tr.add(clap(), t0 + 3*BEAT, .15, .18)
+                for k in range(8): tr.add(shaker(), t0 + k*E, .5, .18 if k % 2 else .1)
+        else:
+            tr.add(pizz(freq(root, shift), 1.6), t0, 0, .65); tr.add(felt_chord(fr, 2.0), t0, -.3, .45); tr.add(stomp(), t0, 0, .45)
+        if mel is None and not fin and bi >= 2:
+            for k, nn in enumerate([tri[0], tri[1], tri[2], tri[1]]): tr.add(mandolin(freq(nn, shift + 12), .3), t0 + k*BEAT + E, .35, .3)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E*.95 + (1.4 if fin else 0)
+                    tr.add(mandolin(f, L), t0 + p*E, .1, .75)
+                p += ln
+    return tr.buf
+
+# ---------- "Toet's Color Mixing" (learning): gentle bouncy 4/4 in E-flat ~96 bpm – xylophone lead doubled softly by a celesta-like bell,
+# ---------- harp arpeggios, round pizzicato bass, soft 'splash' brushes on 2/4, tiny finger cymbal every 2 bars ----------
+CM_A = [[('G5',2),('A#5',2),('D#6',3),('D6',1)], [('C6',2),('A#5',2),('G5',4)], [('G#5',2),('C6',2),('D#6',2),('F6',2)], [('D6',6),('-',2)],
+        [('D#6',1),('D6',1),('C6',1),('A#5',1),('G5',2),('A#5',2)], [('C6',2),('G#5',2),('F5',4)], [('F5',1),('G5',1),('G#5',1),('A#5',1),('D6',2),('C6',2)], [('A#5',6),('-',2)]]
+CM_ACH = ['D#','Cm','G#','A#','D#','Fm','A#','D#']
+CM_B = [[('C6',3),('A#5',1),('G5',2),('C6',2)], [('A#5',3),('G#5',1),('G5',4)], [('F5',2),('G#5',2),('C6',2),('G#5',2)], [('A#5',6),('-',2)],
+        [('G5',2),('A#5',2),('D#6',2),('G6',2)], [('F6',2),('D#6',2),('C6',4)], [('G#5',2),('C6',2),('A#5',2),('D6',2)], [('D#6',6),('-',2)]]
+CM_BCH = ['Cm','D#','Fm','A#','D#','G#','A#','D#']
+
+def xylo_lead(f, length):
+    n = int(length*SR); t = tt(n)
+    s = np.sin(2*np.pi*f*t) * np.exp(-t/.28) + .5*np.sin(2*np.pi*3.93*f*t) * np.exp(-t/.05) + .2*np.sin(2*np.pi*9.4*f*t) * np.exp(-t/.015)
+    return s * np.minimum(t/.001, 1) * np.clip((length - t)/.03, 0, 1) * .5
+
+def bell_soft(f, length):
+    n = int(length*SR); t = tt(n)
+    return (np.sin(2*np.pi*f*t) + .3*np.sin(2*np.pi*2.76*f*t)*np.exp(-t/.2)) * np.exp(-t/1.1) * np.minimum(t/.003, 1) * np.clip((length - t)/.05, 0, 1) * .4
+
+def harp_note(f, length=.9):
+    n = int(length*SR); t = tt(n)
+    return (np.sin(2*np.pi*f*t) + .3*np.sin(4*np.pi*f*t)*np.exp(-t/.3)) * np.exp(-t/.9) * np.minimum(t/.004, 1) * np.clip((length - t)/.05, 0, 1) * .5
+
+def finger_cymbal():
+    n = int(1.5*SR); t = tt(n)
+    return sum(np.sin(2*np.pi*f*t) for f in (2960, 4410, 6230)) * np.exp(-t/.5) * np.minimum(t/.001, 1) * .12
+
+def colormix_long(dur, shift=0):
+    BEAT = .625; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'D#': ('D#2', ['D#4','G4','A#4']), 'Cm': ('C3', ['C4','D#4','G4']), 'G#': ('G#2', ['C4','D#4','G#4']), 'A#': ('A#2', ['D4','F4','A#4']),
+          'Fm': ('F2', ['C4','F4','G#4'])}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(CM_A, CM_ACH), (None, ['D#','G#','A#','D#','Cm','Fm','A#','A#']), (CM_B, CM_BCH), (None, ['G#','D#','Fm','A#','D#','Cm','A#','D#'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'D#'),(None,'A#')] + body[:nb - 4] + [(CM_A[6], 'A#'), ([('D#6',8)], 'D#')]
+    last = len(song) - 1
+    ARP = [0, 1, 2, 1, 2, 1, 0, 1]
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in tri]; rf = freq(root, shift)
+        if not fin:
+            for b, m in enumerate([1, 1.5, 1, 1.5]): tr.add(pizz(rf*m, .5), t0 + b*BEAT, -.05, .55)
+            for p in range(8): tr.add(harp_note(fr[ARP[p]]*(2 if p in (2, 4) else 1), .8), t0 + p*E, -.35, .2)
+            if bi >= 2:
+                for b in (1, 3): tr.add(brush_hit(), t0 + b*BEAT, .3, .35)
+                for p in range(8): tr.add(shaker(), t0 + p*E, .5, .12 if p % 2 else .07)
+                if bi % 2 == 0: tr.add(finger_cymbal(), t0, .4, .5)
+        else:
+            tr.add(pizz(rf, 1.6), t0, 0, .6)
+            for k, f in enumerate(fr + [fr[0]*2]): tr.add(harp_note(f, 2.4), t0 + k*.08, -.3, .35)
+        if mel is None and not fin and bi >= 2:
+            for k, nn in enumerate([tri[2], tri[1], tri[0], tri[1]]): tr.add(bell_soft(freq(nn, shift + 12), 1.0), t0 + k*BEAT + E, .3, .22)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E + (1.6 if fin else .25)
+                    tr.add(xylo_lead(f, L), t0 + p*E, .1, .75); tr.add(bell_soft(f, L + .4), t0 + p*E, -.1, .18)
+                p += ln
+    return tr.buf

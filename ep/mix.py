@@ -30,6 +30,8 @@ elif kind == 'foodabc': music = foodabc_long(dur, m.get('shift', 0))
 elif kind == 'stars': music = stars_long(dur, m.get('shift', 0))
 elif kind == 'shapehunt': music = shapehunt_long(dur, m.get('shift', 0))
 elif kind == 'vehicleabc': music = vehicleabc_long(dur, m.get('shift', 0))
+elif kind == 'digger': music = digger_long(dur, m.get('shift', 0))
+elif kind == 'colormix': music = colormix_long(dur, m.get('shift', 0))
 else: music = lullaby(dur)
 events = [(t, make(name), g, pan) for t, name, g, pan in info['events']]
 duck = [tuple(d) for d in info['duck']]
