@@ -1,4 +1,4 @@
-# YouTube playlists – sorted AUTOMATICALLY every night by .github/workflows/playlists.yml (tools/yt_playlists.py, rules in tools/playlists.json, matched on the title). Needs one-time secrets YT_CLIENT_ID / YT_CLIENT_SECRET / YT_REFRESH_TOKEN; after that Hans does nothing.
+# YouTube playlists – sorted AUTOMATICALLY every night by .github/workflows/playlists.yml (tools/yt_playlists.py, rules in tools/playlists.json, matched on the title). Needs one-time secrets YT_CLIENT_ID / YT_CLIENT_SECRET / YT_REFRESH_TOKEN; after that Hans does nothing. STATUS 2026-11-21: the secrets were never set, so the nightly run has only been skipping (it reports 'success'). One-time setup: tools/yt_auth.py.
 
 | Playlist (English, as on YouTube) | What goes in | Videos so far |
 |---|---|---|
