@@ -1,6 +1,6 @@
 """Sorts the channel's long-form videos into YouTube playlists automatically (rules in tools/playlists.json).
 Runs daily in GitHub Actions. Needs repository secrets YT_CLIENT_ID, YT_CLIENT_SECRET, YT_REFRESH_TOKEN (OAuth, scope youtube).
-Creates missing playlists (public), adds each new video once. Never deletes videos. Without secrets it exits quietly.
+Creates missing playlists (public), adds each new video once. Never deletes videos. Without secrets it FAILS on purpose, so the daily check notices it.
 Also (Hans, 2026-11-21): sets the language settings that Metricool cannot send – video language + title/description language = English
 (snippet.defaultAudioLanguage / defaultLanguage) and 'no paid promotion' – on every NEW video (published since LANG_SINCE, default
 2026-11-21; older videos, incl. the Dutch ones, are never touched). Only those fields change; title, description, tags, category and
@@ -9,7 +9,7 @@ import json, os, sys, urllib.request, urllib.parse
 
 CID, SEC, RT = (os.environ.get(k, '') for k in ('YT_CLIENT_ID', 'YT_CLIENT_SECRET', 'YT_REFRESH_TOKEN'))
 if not (CID and SEC and RT):
-    print('No YouTube secrets set – skipping playlist sorting.'); sys.exit(0)
+    print('ERROR: YouTube secrets YT_CLIENT_ID / YT_CLIENT_SECRET / YT_REFRESH_TOKEN are not set – nothing sorted (see tools/yt_auth.py).'); sys.exit(1)
 DRY = os.environ.get('DRY') == '1'
 API = 'https://www.googleapis.com/youtube/v3/'
 
