@@ -1738,3 +1738,114 @@ def colormix_long(dur, shift=0):
                     tr.add(xylo_lead(f, L), t0 + p*E, .1, .75); tr.add(bell_soft(f, L + .4), t0 + p*E, -.1, .18)
                 p += ln
     return tr.buf
+
+# ---------- "Leaf Pile!" (episode en14, The Big Four, autumn): swaying autumn waltz in F, 3/4 ~138 bpm – warm flugelhorn lead,
+# ---------- guitar oom-pah-pah (bass on 1, two soft chord plucks on 2+3), glockenspiel sparkles at phrase ends, dry 'leaf rustle' shaker ----------
+LP_A = [[('C5',2),('F5',2),('A5',2)], [('G5',3),('F5',1),('E5',2)], [('G5',2),('A#5',2),('G5',2)], [('A5',4),('-',2)],
+        [('D5',2),('F5',2),('A#5',2)], [('A5',3),('G5',1),('F5',2)], [('E5',2),('G5',2),('A#5',2)], [('F5',4),('-',2)]]
+LP_ACH = ['F','C','C7','F','Bb','F','C7','F']
+LP_B = [[('D6',3),('C6',1),('A5',2)], [('A#5',3),('A5',1),('F5',2)], [('A5',2),('C6',2),('A5',2)], [('G5',4),('-',2)],
+        [('F5',2),('A5',2),('D6',2)], [('D6',2),('C6',2),('A#5',2)], [('A5',2),('G5',2),('E5',2)], [('F5',4),('-',2)]]
+LP_BCH = ['Dm','Bb','F','C','Dm','Bb','C7','F']
+
+def flugelhorn(f, length):
+    """Warm, round brass: soft attack, few odd/even harmonics, gentle vibrato that grows on long notes."""
+    n = int(length*SR); t = tt(n)
+    vib = 1 + .004*np.sin(2*np.pi*5.2*t)*np.minimum(t/.4, 1)
+    ph = 2*np.pi*f*np.cumsum(vib)/SR
+    s = np.sin(ph) + .45*np.sin(2*ph) + .18*np.sin(3*ph) + .06*np.sin(4*ph)
+    env = np.minimum(t/.05, 1) * (.85 + .15*np.exp(-t/.15)) * np.clip((length - t)/.08, 0, 1)
+    return band(s * env, 150, 4200) * .3
+
+def leaf_rustle():
+    n = int(.18*SR); t = tt(n)
+    return band(rng.standard_normal(n), 1800, 9000) * np.minimum(t/.02, 1) * np.exp(-t/.05) * .45
+
+def leafpile_long(dur, shift=0):
+    BEAT = .435; E = BEAT/2; BAR = 3*BEAT
+    tr = Track(dur)
+    CH = {'F': ('F2', ['A3','C4','F4']), 'C': ('C3', ['G3','C4','E4']), 'C7': ('C3', ['G3','A#3','E4']), 'Bb': ('A#2', ['A#3','D4','F4']),
+          'Dm': ('D3', ['A3','D4','F4'])}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(LP_A, LP_ACH), (LP_B, LP_BCH), (LP_A, LP_ACH), (None, ['F','Dm','Bb','C','F','Dm','C7','C7'])]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'F'),(None,'C7')] + body[:nb - 4] + [(LP_A[6], 'C7'), ([('F5',6)], 'F')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in tri]; rf = freq(root, shift)
+        if not fin:
+            tr.add(pizz(rf, .6), t0, -.05, .65)
+            for b in (1, 2): tr.add(pluck(fr, .32), t0 + b*BEAT, -.3, .38)
+            if bi >= 2:
+                tr.add(leaf_rustle(), t0, .45, .3)
+                for b in (1, 2): tr.add(leaf_rustle(), t0 + b*BEAT, .45, .14)
+            if bi % 4 == 3: tr.add(glock(fr[2]*2, 1.0), t0 + 2*BEAT, .35, .18)
+        else:
+            tr.add(pizz(rf, 1.8), t0, 0, .7); tr.add(pluck(fr + [fr[0]*2], 2.2), t0, -.3, .45); tr.add(glock(fr[0]*2, 2.0), t0 + .1, .35, .25)
+        if mel is None and not fin and bi >= 2:
+            for k, nn in enumerate([tri[2], tri[1], tri[2]]): tr.add(glock(freq(nn, shift), .6), t0 + k*BEAT + E, .35, .12)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E*.94 + (1.6 if fin else 0)
+                    tr.add(flugelhorn(f, L), t0 + p*E, .1, .8)
+                p += ln
+    return tr.buf
+
+# ---------- "10 Little Ducklings" (learning counting #5, Little Truck Toet at the pond): light paddling tune in C, 4/4 ~96 bpm –
+# ---------- soft piccolo lead, plucked double bass, marimba off-beats, two-pitch temple blocks like little duck steps, tiny water-drop blips ----------
+DK_A = [[('E5',1),('G5',1),('C6',2),('G5',2),('E5',2)], [('D5',1),('G5',1),('B5',2),('A5',2),('G5',2)], [('A5',2),('C6',2),('E6',2),('C6',2)], [('A5',3),('G5',1),('F5',4)],
+        [('E5',1),('F5',1),('G5',2),('C6',2),('E6',2)], [('F6',2),('E6',2),('D6',2),('C6',2)], [('B5',2),('D6',2),('G5',2),('B5',2)], [('C6',6),('-',2)]]
+DK_ACH = ['C','G','Am','F','C','F','G','C']
+DK_B = [[('A5',2),('-',1),('A5',1),('C6',2),('A5',2)], [('G5',2),('-',1),('G5',1),('E5',4)], [('F5',2),('A5',2),('D6',2),('A5',2)], [('B5',4),('G5',4)],
+        [('C6',2),('A5',2),('F5',2),('A5',2)], [('G5',2),('E5',2),('C5',2),('E5',2)], [('D5',1),('E5',1),('F5',1),('G5',1),('A5',2),('B5',2)], [('C6',6),('-',2)]]
+DK_BCH = ['F','C','Dm','G','F','C','G','C']
+
+def piccolo(f, length):
+    n = int(length*SR); t = tt(n)
+    vib = 1 + .003*np.sin(2*np.pi*5.8*t)*np.minimum(t/.3, 1)
+    ph = 2*np.pi*f*np.cumsum(vib)/SR
+    s = np.sin(ph) + .08*np.sin(2*ph) + band(rng.standard_normal(n), 3000, 9000)*.025*np.exp(-t/.06)
+    return s * np.minimum(t/.03, 1) * np.clip((length - t)/.06, 0, 1) * .22
+
+def temple_block(high=False):
+    n = int(.15*SR); t = tt(n); f = 1250 if high else 880
+    return (np.sin(2*np.pi*f*t) + .3*np.sin(2*np.pi*f*2.7*t)) * np.exp(-t/.03) * np.minimum(t/.001, 1) * .4
+
+def water_blip(f=1400):
+    n = int(.12*SR); t = tt(n)
+    return np.sin(2*np.pi*np.cumsum(f*(1 + 1.2*t/.12))/SR) * np.exp(-t/.035) * .25
+
+def ducks_long(dur, shift=0):
+    BEAT = .625; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'C': ('C3', ['E4','G4','C5']), 'G': ('G2', ['D4','G4','B4']), 'Am': ('A2', ['E4','A4','C5']), 'F': ('F2', ['F4','A4','C5']), 'Dm': ('D3', ['D4','F4','A4'])}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(DK_A, DK_ACH), (None, ['C','Am','F','G','C','Am','Dm','G']), (DK_B, DK_BCH), (DK_A, DK_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'C'),(None,'G')] + body[:nb - 4] + [(DK_A[6], 'G'), ([('C6',8)], 'C')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in tri]; rf = freq(root, shift)
+        if not fin:
+            for b, m in enumerate([1, 1.5, 1, 1.5]): tr.add(pizz(rf*m, .45), t0 + b*BEAT, -.05, .6)
+            for b in range(4): tr.add(marimba(fr[b % 3], .35), t0 + b*BEAT + E, -.35, .22)
+            if bi >= 2:
+                for k in range(4): tr.add(temple_block(k % 2 == 1), t0 + k*BEAT, .3, .2 if k % 2 == 0 else .14)
+                if bi % 2 == 1: tr.add(water_blip(1200 + 200*(bi % 3)), t0 + 3*BEAT + E, .5, .5)
+        else:
+            tr.add(pizz(rf, 1.6), t0, 0, .65)
+            for k, f in enumerate(fr): tr.add(marimba(f, 1.8), t0 + k*.07, -.3, .3)
+        if mel is None and not fin and bi >= 2:
+            for k, nn in enumerate([tri[0], tri[1], tri[2], tri[1]]): tr.add(marimba(freq(nn, shift + 12), .4), t0 + k*BEAT, .35, .2)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E*.9 + (1.4 if fin else 0)
+                    tr.add(piccolo(f, L), t0 + p*E, .1, .8)
+                p += ln
+    return tr.buf

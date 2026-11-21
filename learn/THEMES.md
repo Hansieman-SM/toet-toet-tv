@@ -19,3 +19,4 @@ Mark a theme as used with date + job name. Seasonal: autumn until ±Nov 30, wint
 | 12 | Counting | 10 Presents from Santa (own Santa design, December) | The Big Four | |
 | 13 | ABC | Winter ABC (I Igloo, M Mitten, S Snowman, P Penguin…) | Little Truck Toet | |
 | 14 | Color Mixing (approved 2026-11-12) | Toet's Color Mixing: two paint pots pour together → red + yellow = orange, blue + yellow = green, red + blue = purple; 3-dot "what will it be?" pause before each reveal, recap | Little Truck Toet | 2026-11-20 learn-toets-color-mixing (YT 2026-11-21 14:00) |
+| 15 | Counting (autumn) | 10 Little Ducklings: ducklings pop out of the reeds one by one and swim to Mama Duck on the pond | Little Truck Toet | 2026-11-21 learn-10-little-ducklings (YT 2026-11-22 14:00) |
