@@ -1,7 +1,7 @@
 // Learning series – Counting #5: 10 Little Ducklings with Little Truck Toet (autumn pond).
 // Toet parks next to a pond where Mama Duck is waiting for her babies. One by one a duckling pops out of the reeds and swims to join
 // the line behind Mama Duck. A tray of 10 at the top fills up, each new duckling gets a big numeral + number word, a "peep" and a rising
-// chime. Then: "Ten little ducklings!", recap 1–10, and the duck family paddles away while Toet drives off.
+// chime. Then: "Ten little ducklings!", recap 1–10, and Toet says goodbye to the duck family and drives off.
 // New music: ducks_long (piccolo lead, plucked bass, marimba, temple blocks like little duck steps; C major 4/4).
 const C = require('../lib/common'), T = require('../lib/toet'), F = require('../lib/toetfriends');
 const St = require('../lib/story');
@@ -140,9 +140,9 @@ St.episode({
       },
       sfx: Array.from({ length: 10 }, (_, i) => [2 + i * 1.25, `chime:${NOTES[i]}`, .55]).concat([[14.6, 'cheer', .4]]) },
 
-    // 5 – the duck family paddles away, Toet drives off
+    // 5 – the duck family waves goodbye, Toet drives off
     { d: 12, draw: (u, c) => {
-        const k = ease(clamp((u - 5) / 5)), bx = lerp(BX, 1150, k), dk = ease(clamp((u - 3.4) / 7)) * 520;
+        const k = ease(clamp((u - 5) / 5)), bx = lerp(BX, 1150, k), dk = 0;   // the duck family stays fully in view
         scene(c.t, 560 + k * 340, () => { x.save(); x.translate(-k * 340, 0); x.restore(); mama(c.t, dk, win(u, .6, 1.6, .2)); family(10, c.t, dk); reeds(c.t); });
         truck(c.t, { bx, moving: u > 5, dist: 560 + k * 340, mouth: c.talk('toet') });
       },
