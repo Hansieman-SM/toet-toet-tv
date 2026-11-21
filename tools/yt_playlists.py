@@ -5,9 +5,9 @@ Also (Hans, 2026-11-21): sets the language settings that Metricool cannot send �
 (snippet.defaultAudioLanguage / defaultLanguage) and 'no paid promotion' – on every NEW video (published since LANG_SINCE, default
 2026-11-21; older videos, incl. the Dutch ones, are never touched). Only those fields change; title, description, tags, category and
 made-for-kids stay exactly as they are. (Caption certification has no API field – it is optional and not needed for our videos.)"""
-import json, os, sys, urllib.request, urllib.parse
+import json, os, sys, urllib.request, urllib.parse, urllib.error
 
-CID, SEC, RT = (os.environ.get(k, '') for k in ('YT_CLIENT_ID', 'YT_CLIENT_SECRET', 'YT_REFRESH_TOKEN'))
+CID, SEC, RT = (os.environ.get(k, '').strip() for k in ('YT_CLIENT_ID', 'YT_CLIENT_SECRET', 'YT_REFRESH_TOKEN'))
 if not (CID and SEC and RT):
     print('ERROR: YouTube secrets YT_CLIENT_ID / YT_CLIENT_SECRET / YT_REFRESH_TOKEN are not set – nothing sorted (see tools/yt_auth.py).'); sys.exit(1)
 DRY = os.environ.get('DRY') == '1'
@@ -15,7 +15,9 @@ API = 'https://www.googleapis.com/youtube/v3/'
 
 def token():
     data = urllib.parse.urlencode({'client_id': CID, 'client_secret': SEC, 'refresh_token': RT, 'grant_type': 'refresh_token'}).encode()
-    return json.load(urllib.request.urlopen('https://oauth2.googleapis.com/token', data))['access_token']
+    try: return json.load(urllib.request.urlopen('https://oauth2.googleapis.com/token', data))['access_token']
+    except urllib.error.HTTPError as e:
+        print('ERROR getting a Google access token:', e.code, e.read().decode()[:300]); sys.exit(1)
 TOK = token()
 
 def call(method, path, params=None, body=None):
