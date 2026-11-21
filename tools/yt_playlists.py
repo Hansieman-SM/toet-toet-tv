@@ -1,6 +1,10 @@
 """Sorts the channel's long-form videos into YouTube playlists automatically (rules in tools/playlists.json).
 Runs daily in GitHub Actions. Needs repository secrets YT_CLIENT_ID, YT_CLIENT_SECRET, YT_REFRESH_TOKEN (OAuth, scope youtube).
-Creates missing playlists (public), adds each new video once. Never deletes or edits videos. Without secrets it exits quietly."""
+Creates missing playlists (public), adds each new video once. Never deletes videos. Without secrets it exits quietly.
+Also (Hans, 2026-11-21): sets the language settings that Metricool cannot send – video language + title/description language = English
+(snippet.defaultAudioLanguage / defaultLanguage) and 'no paid promotion' – on every NEW video (published since LANG_SINCE, default
+2026-11-21; older videos, incl. the Dutch ones, are never touched). Only those fields change; title, description, tags, category and
+made-for-kids stay exactly as they are. (Caption certification has no API field – it is optional and not needed for our videos.)"""
 import json, os, sys, urllib.request, urllib.parse
 
 CID, SEC, RT = (os.environ.get(k, '') for k in ('YT_CLIENT_ID', 'YT_CLIENT_SECRET', 'YT_REFRESH_TOKEN'))
@@ -57,3 +61,22 @@ for vid, title in videos:
         call('POST', 'playlistItems', {'part': 'snippet'}, {'snippet': {'playlistId': pid, 'resourceId': {'kind': 'youtube#video', 'videoId': vid}}})
     members[pid].add(vid); added += 1
 print(f'done – {added} video(s) added to playlists')
+
+# ---- language settings for new videos ----
+SINCE = os.environ.get('LANG_SINCE', '2026-11-21T00:00:00Z')
+ids = [i['contentDetails']['videoId'] for i in pages('playlistItems', {'part': 'contentDetails', 'playlistId': uploads})
+       if (i['contentDetails'].get('videoPublishedAt') or '') >= SINCE]
+fixed = 0
+for k in range(0, len(ids), 50):
+    for v in call('GET', 'videos', {'part': 'snippet,paidProductPlacementDetails', 'id': ','.join(ids[k:k + 50])}).get('items', []):
+        sn = v['snippet']
+        if sn.get('defaultLanguage') != 'en' or sn.get('defaultAudioLanguage') != 'en':
+            body = {'id': v['id'], 'snippet': {key: sn[key] for key in ('title', 'description', 'categoryId', 'tags') if key in sn}}
+            body['snippet'].update(defaultLanguage='en', defaultAudioLanguage='en')
+            print('language -> English:', sn['title'])
+            if not DRY: call('PUT', 'videos', {'part': 'snippet'}, body)
+            fixed += 1
+        if (v.get('paidProductPlacementDetails') or {}).get('hasPaidProductPlacement'):
+            print('paid promotion -> no:', sn['title'])
+            if not DRY: call('PUT', 'videos', {'part': 'paidProductPlacementDetails'}, {'id': v['id'], 'paidProductPlacementDetails': {'hasPaidProductPlacement': False}})
+print(f'done – language set on {fixed} new video(s)')
