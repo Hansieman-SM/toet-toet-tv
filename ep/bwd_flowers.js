@@ -108,8 +108,8 @@ function dandelion(t) {
     for (let j = 0; j < 5; j++) { const b = a + (j - 2) * .25; x.beginPath(); x.moveTo(ex, ey); x.lineTo(ex + Math.cos(b) * 16, ey + Math.sin(b) * 16); line(2.5); } }
   // flying seeds
   if (fly > .2) for (let i = 0; i < 6; i++) { const k = (fly - .2) / .8, a = (i * 3) * TAU / 18;
-    const px = Math.cos(a) * 92 + k * (120 + i * 18) + Math.sin(k * 8 + i) * 14, py = -40 + Math.sin(a) * 92 - k * 160;
-    x.save(); x.globalAlpha *= Math.min(1, (1 - k) * 4); x.beginPath(); x.moveTo(px, py); x.lineTo(px, py + 18); line(2.5); for (let j = 0; j < 5; j++) { const b = -Math.PI / 2 + (j - 2) * .4; x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.cos(b) * 12, py + Math.sin(b) * 12); line(2); } x.restore(); }
+    const px = Math.cos(a) * 92 + k * (90 + i * 12) + Math.sin(k * 8 + i) * 14, py = -40 + Math.sin(a) * 92 - k * 70;
+    x.save(); x.globalAlpha *= Math.min(1, (1 - k) * 2.5); x.beginPath(); x.moveTo(px, py); x.lineTo(px, py + 18); line(2.5); for (let j = 0; j < 5; j++) { const b = -Math.PI / 2 + (j - 2) * .4; x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.cos(b) * 12, py + Math.sin(b) * 12); line(2); } x.restore(); }
   face(0, -42, .7, t, .5);
 }
 function bells(t) {
@@ -117,7 +117,7 @@ function bells(t) {
   x.beginPath(); x.moveTo(-150, 160); x.quadraticCurveTo(-120, -120, 150, -80); line(10);
   leafShape(-150, 160, 150, 40, -1.2);
   for (let i = 0; i < 5; i++) { const k = i / 4, px = -130 + k * 270, py = -40 - Math.sin(k * Math.PI) * 60 + k * 10;
-    const sw = per(t + i * 3, 40) * .35;
+    const sw = per(t + i * .4, 40) * .25;   // swing together with a small lag (never into each other)
     x.save(); x.translate(px, py); x.rotate(sw);
     x.beginPath(); x.moveTo(0, 0); x.lineTo(0, 30); line(4);
     x.beginPath(); x.moveTo(-26, 80); x.quadraticCurveTo(-28, 30, 0, 28); x.quadraticCurveTo(28, 30, 26, 80); x.quadraticCurveTo(14, 70, 8, 82); x.quadraticCurveTo(0, 72, -8, 82); x.quadraticCurveTo(-14, 70, -26, 80); x.fillStyle = WH; x.fill();

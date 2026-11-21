@@ -1,7 +1,7 @@
 #!/bin/bash
 # Learning series #15 – Counting #5: 10 Little Ducklings (ep/learn12_ducklings.js: Little Truck Toet parks by an autumn pond where Mama Duck
 # calls her babies; one by one a duckling (each with its own little coloured bow) pops out of the reeds and swims to the line behind Mama
-# Duck; tray of 10, big numeral + number word, peep + rising chime; "Ten little ducklings!", recap 1–10, Toet says goodbye (rev2: the duck family stays fully in view at the end);
+# Duck; tray of 10, big numeral + number word, peep + rising chime; "Ten little ducklings!", recap 1–10, Toet says goodbye (rev2: the duck family stays fully in view at the end; rev3: re-render after the batch run overwrote rev2);
 # new music ducks_long: piccolo lead, plucked bass, marimba off-beats, temple blocks, water blips, C major)
 set -e; S=2026-11-21-learn-10-little-ducklings; O=release/$S; mkdir -p $O
 python3 ep/mix.py ep/learn12_ducklings.js $O/audio.wav
