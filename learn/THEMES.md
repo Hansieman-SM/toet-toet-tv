@@ -20,3 +20,4 @@ Mark a theme as used with date + job name. Seasonal: autumn until ±Nov 30, wint
 | 13 | ABC | Winter ABC (I Igloo, M Mitten, S Snowman, P Penguin…) | Little Truck Toet | |
 | 14 | Color Mixing (approved 2026-11-12) | Toet's Color Mixing: two paint pots pour together → red + yellow = orange, blue + yellow = green, red + blue = purple; 3-dot "what will it be?" pause before each reveal, recap | Little Truck Toet | 2026-11-20 learn-toets-color-mixing (YT 2026-11-21 14:00) |
 | 15 | Counting (autumn) | 10 Little Ducklings: ducklings pop out of the reeds one by one and swim to Mama Duck on the pond | Little Truck Toet | 2026-11-21 learn-10-little-ducklings (YT 2026-11-22 14:00) |
+| 16 | Can You Find It? (autumn) | Forest Animals – who is hiding? Ears / tail / spikes / eyes peek out behind a leaf pile, a log and a bush (bunny, squirrel, hedgehog, owl, fox, mouse) | Little Truck Toet | 2026-11-22 learn-can-you-find-it-forest-animals (YT 2026-11-23 14:00) |

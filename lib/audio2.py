@@ -1849,3 +1849,60 @@ def ducks_long(dur, shift=0):
                     tr.add(piccolo(f, L), t0 + p*E, .1, .8)
                 p += ln
     return tr.buf
+
+# ---------- "Can You Find It? Forest Animals" (learning #16, Little Truck Toet in the autumn woods): gentle tiptoe swing in D, 4/4 ~92 bpm –
+# ---------- soft accordion lead (two slightly detuned reeds + bellows swell), harpsichord broken chords, round triangle-wave bass,
+# ---------- brush taps + dry wood clicks like little footsteps in the leaves ----------
+FF_A = [[('F#5',1),('A5',1),('D6',2),('A5',1),('F#5',1),('E5',2)], [('D5',1),('E5',1),('F#5',2),('E5',2),('-',2)], [('G5',1),('B5',1),('D6',2),('B5',1),('G5',1),('F#5',2)], [('E5',2),('A5',2),('C#6',2),('A5',2)],
+        [('F#5',1),('A5',1),('D6',2),('E6',2),('D6',2)], [('B5',2),('G5',2),('B5',1),('A5',1),('G5',2)], [('F#5',2),('E5',2),('A5',2),('C#6',2)], [('D6',6),('-',2)]]
+FF_ACH = ['D','D','G','A','D','G','A7','D']
+FF_B = [[('B5',2),('-',1),('B5',1),('A5',2),('F#5',2)], [('G5',2),('-',1),('G5',1),('E5',4)], [('A5',1),('B5',1),('A5',1),('F#5',1),('D5',2),('F#5',2)], [('E5',6),('-',2)],
+        [('B5',2),('D6',2),('B5',2),('G5',2)], [('A5',2),('F#5',2),('D5',2),('F#5',2)], [('E5',1),('F#5',1),('G5',1),('A5',1),('B5',2),('C#6',2)], [('D6',6),('-',2)]]
+FF_BCH = ['G','Em','D','A','G','D','A7','D']
+
+def accordion(f, length):
+    n = int(length*SR); t = tt(n)
+    swell = np.minimum(t/.07, 1) * np.clip((length - t)/.08, 0, 1) * (1 + .06*np.sin(2*np.pi*4.5*t))
+    s = 0
+    for det in (1.0, 1.0035):
+        ph = 2*np.pi*f*det*t
+        s = s + sum(np.sin(k*ph) * (.9**k) / k**.7 for k in range(1, 8))
+    return s * swell * .09
+
+def wood_click(high=False):
+    n = int(.08*SR); t = tt(n); f = 2200 if high else 1600
+    return (np.sin(2*np.pi*f*t) * .6 + band(rng.standard_normal(n), 1500, 5000) * .5) * np.exp(-t/.012) * .35
+
+def forestfind_long(dur, shift=0):
+    BEAT = .65; E = BEAT/2; BAR = 4*BEAT; SW = BEAT*.6
+    tr = Track(dur)
+    CH = {'D': ('D3', ['F#4','A4','D5']), 'G': ('G2', ['G4','B4','D5']), 'A': ('A2', ['E4','A4','C#5']), 'A7': ('A2', ['E4','G4','C#5']),
+          'Em': ('E3', ['E4','G4','B4']), 'Bm': ('B2', ['D4','F#4','B4'])}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(FF_A, FF_ACH), (None, ['D','Bm','G','A','D','Bm','Em','A7']), (FF_B, FF_BCH), (FF_A, FF_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'D'),(None,'A7')] + body[:nb - 4] + [(FF_A[6], 'A7'), ([('D6',8)], 'D')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in tri]; rf = freq(root, shift)
+        if not fin:
+            for b, m in enumerate([1, 1.5, 1, 1.5]): tr.add(tri_bass(rf*m, .5), t0 + b*BEAT, -.05, .5)
+            for b in range(4):
+                tr.add(harpsi([fr[0], fr[2]] if b % 2 == 0 else [fr[1]], .45), t0 + b*BEAT + SW, -.35, .5)
+            if bi >= 2:
+                for b in range(4): tr.add(brush_hit(), t0 + b*BEAT, .25, .16 if b % 2 else .1)
+                for b in range(4): tr.add(wood_click(b % 2 == 1), t0 + b*BEAT + SW, .45, .14)
+        else:
+            tr.add(tri_bass(rf, 1.8), t0, 0, .55); tr.add(harpsi(fr, 2.0), t0, -.3, .7)
+        if mel is None and not fin and bi >= 2:
+            for k, nn in enumerate([tri[0], tri[2], tri[1], tri[2]]): tr.add(harpsi([freq(nn, shift + 12)], .5), t0 + k*BEAT + (SW if k % 2 else 0), .35, .35)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E*.88 + (1.4 if fin else 0)
+                    st = p*E; st = (st // BEAT)*BEAT + (SW if (p % 2) else 0)
+                    tr.add(accordion(f, L), t0 + st, .1, .8)
+                p += ln
+    return tr.buf
