@@ -1906,3 +1906,61 @@ def forestfind_long(dur, shift=0):
                     tr.add(accordion(f, L), t0 + st, .1, .8)
                 p += ln
     return tr.buf
+
+# ---------- "Winter ABC" (learning ABC #5, Little Truck Toet in the snowy park): gentle snow-day waltz in G, 3/4 ~96 bpm –
+# ---------- glockenspiel lead, hammered-dulcimer broken chords, soft reedy bassoon bass, very light shaker/jingle on beat 3 ----------
+WA_A = [[('D5',2),('G5',1),('B5',3)], [('A5',2),('G5',1),('E5',3)], [('D5',2),('E5',1),('G5',2),('A5',1)], [('B5',4),('-',2)],
+        [('D6',2),('B5',1),('G5',3)], [('C6',2),('A5',1),('F#5',3)], [('E5',1),('F#5',1),('G5',1),('A5',2),('F#5',1)], [('G5',4),('-',2)]]
+WA_ACH = ['G','C','G','D','G','Am','D7','G']
+WA_B = [[('E5',2),('G5',1),('C6',3)], [('B5',2),('G5',1),('D5',3)], [('C6',2),('A5',1),('E5',2),('F#5',1)], [('G5',4),('-',2)],
+        [('E5',1),('F#5',1),('G5',2),('B5',2)], [('A5',2),('F#5',1),('D5',3)], [('E5',2),('C6',1),('B5',2),('A5',1)], [('G5',4),('-',2)]]
+WA_BCH = ['C','G','Am','Em','C','D','Am','G']
+
+def bassoon(f, length):
+    """Soft reedy bassoon-ish bass: odd-heavy harmonics, breathy slow attack, gentle low-pass."""
+    n = int(length*SR); t = tt(n)
+    ph = 2*np.pi*f*t*(1 + .002*np.sin(2*np.pi*4.8*t))
+    s = np.sin(ph) + .55*np.sin(2*ph) + .4*np.sin(3*ph) + .18*np.sin(4*ph) + .12*np.sin(5*ph)
+    env = np.minimum(t/.05, 1) * np.clip((length - t)/.08, 0, 1) * np.exp(-t/1.6)
+    return s * env * .22
+
+def dulcimer(freqs, length=.7):
+    """Hammered dulcimer: bright metal strings struck by light hammers, doubled courses slightly detuned."""
+    n = int(length*SR); t = tt(n); out = np.zeros(n)
+    for f in freqs:
+        for d in (.998, 1.002):
+            out += sum(np.sin(2*np.pi*h*f*d*t) * np.exp(-t*(1.8 + h*1.6)) / h for h in range(1, 5))
+    return out * np.minimum(t/.002, 1) / (2*len(freqs)) * .5
+
+def winterabc_long(dur, shift=0):
+    BEAT = .625; E = BEAT/2; BAR = 3*BEAT
+    tr = Track(dur)
+    CH = {'G': ('G2', ['G4','B4','D5']), 'C': ('C3', ['G4','C5','E5']), 'D': ('D3', ['F#4','A4','D5']), 'D7': ('D3', ['F#4','C5','D5']),
+          'Am': ('A2', ['A4','C5','E5']), 'Em': ('E3', ['G4','B4','E5'])}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(WA_A, WA_ACH), (None, ['G','Em','C','D','G','Em','Am','D7']), (WA_B, WA_BCH), (WA_A, WA_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'G'),(None,'D7')] + body[:nb - 4] + [(WA_A[6], 'D7'), ([('G5',6)], 'G')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in tri]; rf = freq(root, shift)
+        if not fin:
+            tr.add(bassoon(rf, BEAT*1.8), t0, -.05, .55)
+            tr.add(bassoon(rf*1.5, BEAT*.9), t0 + 2*BEAT, -.05, .3)
+            for b in (1, 2): tr.add(dulcimer([fr[1], fr[2]] if b == 1 else [fr[0], fr[2]], .7), t0 + b*BEAT, -.3, .45)
+            if bi >= 2:
+                tr.add(sleigh(bi), t0 + 2*BEAT, .4, .12)
+                if bi % 4 == 3: tr.add(sleigh(bi + 1), t0 + 2*BEAT + E, .4, .07)
+        else:
+            tr.add(bassoon(rf, 2.4), t0, 0, .6); tr.add(dulcimer(fr, 2.2), t0, -.3, .6)
+        if mel is None and not fin and bi >= 2:
+            for k, nn in enumerate([tri[0], tri[1], tri[2], tri[1], tri[2], tri[1]]): tr.add(dulcimer([freq(nn, shift + 12)], .5), t0 + k*E, .35, .22)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift)/2; L = max(.6, ln*E + .4) + (1.4 if fin else 0)
+                    tr.add(glock(f, L), t0 + p*E, .1, .42)
+                p += ln
+    return tr.buf
