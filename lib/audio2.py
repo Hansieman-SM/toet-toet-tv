@@ -1964,3 +1964,149 @@ def winterabc_long(dur, shift=0):
                     tr.add(glock(f, L), t0 + p*E, .1, .42)
                 p += ln
     return tr.buf
+
+# ---------- "Tessa the Tractor" (Helper Friends episode): easy-going country two-step in A, ~108 bpm – gliding lap-steel lead,
+# ---------- boom-chick steel-string guitar strums, breathy jug bass, washboard scrapes on the off-beats, soft spoon clicks ----------
+TT_A = [[('E5',2),('A5',2),('C#6',3),('B5',1)], [('A5',2),('F#5',2),('E5',4)], [('D5',2),('F#5',2),('A5',3),('G#5',1)], [('B5',6),('-',2)],
+        [('C#6',2),('B5',1),('A5',1),('E5',2),('C#5',2)], [('D5',2),('F#5',2),('B5',4)], [('A5',1),('B5',1),('C#6',2),('B5',2),('G#5',2)], [('A5',6),('-',2)]]
+TT_ACH = ['A','D','D','E','A','D','E','A']
+TT_B = [[('F#5',2),('A5',2),('D6',4)], [('C#6',2),('A5',2),('E5',4)], [('F#5',2),('G#5',2),('A5',2),('B5',2)], [('C#6',6),('-',2)],
+        [('D6',2),('C#6',2),('B5',2),('A5',2)], [('E5',3),('F#5',1),('A5',4)], [('B5',2),('A5',1),('G#5',1),('F#5',2),('E5',2)], [('E5',6),('-',2)]]
+TT_BCH = ['D','A','F#m','A','D','A','Bm','E']
+
+def lap_steel(f, length, slide=True):
+    """Lap-steel guitar: soft attack, slides up a whole step into the note, slow wide vibrato, long ring."""
+    n = int(length*SR); t = tt(n)
+    glide = (2**(-2/12) + (1 - 2**(-2/12)) * np.minimum(t/.09, 1)) if slide else 1.0
+    vib = 1 + .006*np.sin(2*np.pi*5.0*t)*np.minimum(t/.35, 1)
+    ph = 2*np.pi*f*np.cumsum(glide*vib)/SR
+    s = np.sin(ph) + .45*np.sin(2*ph) + .22*np.sin(3*ph) + .1*np.sin(4*ph)
+    env = np.minimum(t/.03, 1) * np.exp(-t/1.8) * np.clip((length - t)/.08, 0, 1)
+    return s * env * .3
+
+def steel_strum(freqs, length=.35, down=True):
+    n = int(length*SR); out = np.zeros(n)
+    for i, f in enumerate(freqs if down else freqs[::-1]):
+        d = int(i*.009*SR); m = n - d
+        if m <= 0: continue
+        t = tt(m)
+        out[d:] += sum(np.sin(2*np.pi*k*f*t) * np.exp(-t*(4 + k*2.2)) / k for k in range(1, 7)) * np.minimum(t/.002, 1)
+    t = tt(n)
+    return out / len(freqs) * np.clip((length - t)/.04, 0, 1) * .55
+
+def jug(f, length):
+    """Jug bass: a low hum with a breathy 'whoo' formant that swells and fades."""
+    n = int(length*SR); t = tt(n)
+    s = np.sin(2*np.pi*f*t) + .3*np.sin(4*np.pi*f*t) + .12*np.sin(6*np.pi*f*t)
+    breath = band(rng.standard_normal(n), 250, 900) * .25
+    env = np.minimum(t/.04, 1) * np.exp(-t/.35) * np.clip((length - t)/.05, 0, 1)
+    return (s + breath) * env * .5
+
+def washboard():
+    n = int(.12*SR); t = tt(n)
+    rasp = band(rng.standard_normal(n), 2500, 8000) * (.6 + .4*np.sign(np.sin(2*np.pi*90*t)))
+    return rasp * np.minimum(t/.01, 1) * np.exp(-t/.05) * .35
+
+def spoon():
+    n = int(.06*SR); t = tt(n)
+    return (np.sin(2*np.pi*2800*t) * .5 + band(rng.standard_normal(n), 3000, 9000) * .4) * np.exp(-t/.01) * .3
+
+def tractor_long(dur, shift=0):
+    BEAT = .555; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'A': ('A2', ['A3','C#4','E4','A4']), 'D': ('D3', ['A3','D4','F#4','A4']), 'E': ('E2', ['B3','E4','G#4','B4']),
+          'F#m': ('F#2', ['A3','C#4','F#4','A4']), 'Bm': ('B2', ['B3','D4','F#4','B4'])}
+    FIFTH = {'A': 'E2', 'D': 'A2', 'E': 'B2', 'F#m': 'C#3', 'Bm': 'F#2'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(TT_A, TT_ACH), (None, ['A','F#m','D','E','A','F#m','Bm','E']), (TT_B, TT_BCH), (TT_A, TT_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'A'),(None,'E')] + body[:nb - 4] + [(TT_A[6], 'E'), ([('A5',8)], 'A')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in tri]
+        if not fin:
+            for b, nn in enumerate([root, FIFTH[ch], root, FIFTH[ch]]): tr.add(jug(freq(nn, shift), .5), t0 + b*BEAT, -.05, .55)
+            for b in range(4): tr.add(steel_strum(fr[1:], .3, b % 2 == 0), t0 + b*BEAT + E, -.3, .3)
+            if bi >= 2:
+                for b in range(4): tr.add(washboard(), t0 + b*BEAT + E, .4, .3)
+                for b in (1, 3): tr.add(spoon(), t0 + b*BEAT, .25, .3)
+                if bi % 2: tr.add(spoon(), t0 + 3*BEAT + E*1.5, .25, .18)
+        else:
+            tr.add(jug(freq(root, shift), 1.6), t0, 0, .6); tr.add(steel_strum(fr, 2.0), t0, -.3, .5)
+        if mel is None and not fin and bi >= 2:
+            for k, nn in enumerate([tri[1], tri[3], tri[2], tri[3]]): tr.add(lap_steel(freq(nn, shift + 12), .7, k == 0), t0 + k*BEAT, .35, .28)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E*1.1 + (1.6 if fin else 0)
+                    tr.add(lap_steel(f, L, ln >= 2), t0 + p*E, .1, .8)
+                p += ln
+    return tr.buf
+
+# ---------- "10 Colorful Kites" (learning counting #6, The Big Four on a windy autumn day): breezy soft bossa in D, ~100 bpm –
+# ---------- warm soft alto-sax lead, airy 'breeze' organ pad, pizzicato bass, rim clicks + shaker, wind chimes every 4 bars ----------
+KT_A = [[('F#5',3),('A5',1),('B5',2),('A5',2)], [('F#5',2),('E5',2),('D5',4)], [('E5',3),('F#5',1),('G5',2),('B5',2)], [('A5',6),('-',2)],
+        [('D6',3),('C#6',1),('B5',2),('A5',2)], [('G5',2),('B5',2),('E5',4)], [('F#5',2),('G5',1),('A5',1),('C#6',2),('E5',2)], [('D5',6),('-',2)]]
+KT_ACH = ['D','Bm','Em','A','D','G','A7','D']
+KT_B = [[('B5',3),('A5',1),('G5',2),('E5',2)], [('A5',3),('G5',1),('F#5',4)], [('G5',2),('A5',2),('B5',2),('D6',2)], [('C#6',6),('-',2)],
+        [('B5',2),('D6',2),('A5',2),('F#5',2)], [('G5',3),('F#5',1),('E5',4)], [('E5',2),('F#5',1),('G5',1),('A5',2),('C#6',2)], [('D6',6),('-',2)]]
+KT_BCH = ['G','D','Em','A','Bm','Em','A7','D']
+
+def soft_sax(f, length):
+    """Soft alto-sax-like reed: breathy onset, warm odd/even harmonics, gentle late vibrato."""
+    n = int(length*SR); t = tt(n)
+    vib = 1 + .005*np.sin(2*np.pi*5.2*t)*np.clip((t - .25)/.3, 0, 1)
+    ph = 2*np.pi*f*np.cumsum(vib)/SR
+    s = np.sin(ph) + .5*np.sin(2*ph) + .32*np.sin(3*ph) + .15*np.sin(4*ph) + .07*np.sin(5*ph)
+    breath = band(rng.standard_normal(n), f*1.5, f*6) * .1 * (np.exp(-t/.08) + .3)
+    env = np.minimum(t/.06, 1) * np.clip((length - t)/.12, 0, 1) * (1 - .25*np.minimum(t/1.5, 1))
+    return (s * .2 + breath) * env
+
+def breeze_pad(freqs, length):
+    n = int(length*SR); t = tt(n)
+    s = sum(np.sin(2*np.pi*f*t) + .3*np.sin(2*np.pi*2.002*f*t) + .12*np.sin(2*np.pi*3.004*f*t) for f in freqs) / len(freqs)
+    return s * np.minimum(t/.4, 1) * np.clip((length - t)/.5, 0, 1) * (1 + .1*np.sin(2*np.pi*.7*t)) * .35
+
+def wind_chimes(seed=0):
+    r = np.random.default_rng(int(seed) + 7); n = int(3.0*SR); out = np.zeros(n)
+    for k in range(6):
+        f = r.choice([1760, 1975.5, 2349.3, 2637, 2960, 3520]); st = int(r.uniform(0, 1.4)*SR); m = n - st; t = tt(m)
+        out[st:] += (np.sin(2*np.pi*f*t) + .4*np.sin(2*np.pi*2.76*f*t)*np.exp(-t/.3)) * np.exp(-t/1.1) * r.uniform(.4, 1)
+    return out * .12
+
+def kites_long(dur, shift=0):
+    BEAT = .6; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'D': ('D3', ['F#4','A4','C#5']), 'Bm': ('B2', ['F#4','A4','D5']), 'Em': ('E3', ['G4','B4','D5']), 'A': ('A2', ['E4','A4','C#5']),
+          'A7': ('A2', ['E4','G4','C#5']), 'G': ('G2', ['F#4','B4','D5'])}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(KT_A, KT_ACH), (KT_B, KT_BCH), (None, ['D','Bm','Em','A7','G','D','Em','A7']), (KT_A, KT_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'D'),(None,'A7')] + body[:nb - 4] + [(KT_A[6], 'A7'), ([('D5',8)], 'D')]
+    last = len(song) - 1
+    BOSSA = [0, 3, 6, 10, 13]      # sixteenth positions of the bossa clave over 2 bars (we use 8ths: 0,3,6 / 2,4)
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in tri]; rf = freq(root, shift)
+        if not fin:
+            tr.add(pizz(rf, .5), t0, -.05, .7); tr.add(pizz(rf*1.5, .4), t0 + 1.5*BEAT, -.05, .45)
+            tr.add(pizz(rf, .5), t0 + 2*BEAT, -.05, .6); tr.add(pizz(rf*1.5, .4), t0 + 3.5*BEAT, -.05, .45)
+            tr.add(breeze_pad(fr, BAR*1.02), t0, -.3, .5)
+            if bi >= 2:
+                for p in ((0, 3, 6) if bi % 2 == 0 else (2, 4)): tr.add(rimshot(), t0 + p*E, .3, .12)
+                for k in range(8): tr.add(shaker(), t0 + k*E, .5, .14 if k % 2 else .08)
+                if bi % 4 == 2: tr.add(wind_chimes(bi), t0, .55, .5)
+        else:
+            tr.add(pizz(rf, 1.6), t0, 0, .7); tr.add(breeze_pad(fr, 3.0), t0, -.3, .6); tr.add(wind_chimes(99), t0, .55, .5)
+        if mel is None and not fin and bi >= 2:
+            for k, nn in enumerate([tri[0], tri[2], tri[1], tri[2]]): tr.add(glock(freq(nn, shift)/1, .8), t0 + k*BEAT + E, .35, .16)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E*.95 + (1.5 if fin else 0)
+                    tr.add(soft_sax(f, L), t0 + p*E, .1, .85)
+                p += ln
+    return tr.buf
