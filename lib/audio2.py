@@ -2110,3 +2110,130 @@ def kites_long(dur, shift=0):
                     tr.add(soft_sax(f, L), t0 + p*E, .1, .85)
                 p += ln
     return tr.buf
+
+# ---------- "Toy ABC with The Big Four" (learning ABC #6, toy corner on the savanna): playful wind-up-toy shuffle in A-flat, 4/4 ~104 bpm –
+# ---------- plucky kalimba lead (thumb-piano tines with a soft buzz), clockwork tick-tock clicks on every 8th, little toy tom on 2 + 4,
+# ---------- warm string pad, round soft bass on 1 + 3, a tiny spring 'boing' + bell-tree glissando at phrase ends (written in G, shifted +1) ----------
+TY_A = [[('B4',2),('D5',2),('G5',3),('-',1)], [('F#5',1),('E5',1),('D5',2),('B4',4)], [('C5',2),('E5',2),('A5',2),('G5',2)], [('F#5',6),('-',2)],
+        [('G5',1),('A5',1),('B5',2),('D6',2),('B5',2)], [('C6',2),('A5',2),('E5',4)], [('D5',1),('E5',1),('F#5',2),('A5',2),('F#5',2)], [('G5',6),('-',2)]]
+TY_ACH = ['G','G','C','D','G','Am','D7','G']
+TY_B = [[('E5',2),('G5',2),('B5',3),('-',1)], [('A5',1),('G5',1),('E5',2),('C5',4)], [('D5',2),('F#5',2),('A5',2),('C6',2)], [('B5',6),('-',2)],
+        [('C6',2),('B5',2),('A5',2),('G5',2)], [('A5',1),('B5',1),('A5',2),('E5',4)], [('F#5',2),('G5',1),('A5',1),('B5',2),('A5',2)], [('G5',6),('-',2)]]
+TY_BCH = ['Em','C','D','G','C','Am','D7','G']
+
+def kalimba_lead(f, length):
+    """Kalimba / thumb piano: bright tine pluck, quick inharmonic overtone, tiny rattle buzz, warm decay."""
+    n = int(length*SR); t = tt(n)
+    s = np.sin(2*np.pi*f*t) * np.exp(-t/1.0) + .35*np.sin(2*np.pi*5.4*f*t)*np.exp(-t/.05) + .15*np.sin(2*np.pi*2*f*t)*np.exp(-t/.25)
+    buzz = band(rng.standard_normal(n), f*3, f*8) * .05 * np.exp(-t/.12)
+    return (s + buzz) * np.minimum(t/.003, 1) * np.clip((length - t)/.06, 0, 1) * .45
+
+def clock_tick(hi=True):
+    n = int(.05*SR); t = tt(n); f = 3200 if hi else 2300
+    return (np.sin(2*np.pi*f*t) * .5 + band(rng.standard_normal(n), 2000, 7000) * .35) * np.exp(-t/.006) * .32
+
+def toy_tom():
+    n = int(.25*SR); t = tt(n); fr = 180 * (1 + .6*np.exp(-t/.02))
+    s = np.sin(2*np.pi*np.cumsum(fr)/SR) * np.exp(-t/.09) + band(rng.standard_normal(n), 400, 2500) * .2 * np.exp(-t/.02)
+    return s * .4
+
+def spring_boing():
+    n = int(.6*SR); t = tt(n); fr = 300 + 120*np.sin(2*np.pi*9*t)*np.exp(-t/.25)
+    return np.sin(2*np.pi*np.cumsum(fr)/SR) * np.exp(-t/.22) * np.minimum(t/.005, 1) * .25
+
+def bell_tree(seed=0):
+    n = int(1.4*SR); out = np.zeros(n)
+    for k in range(9):
+        f = 1900 + k*190; st = int(k*.045*SR); m = n - st; tq = tt(m)
+        out[st:] += np.sin(2*np.pi*f*tq) * np.exp(-tq/.5) * (1 - k/14)
+    return out * .07
+
+def toyabc_long(dur, shift=0):
+    shift = shift + 1                                   # written in G, sounds in A-flat
+    BEAT = .577; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'G': ('G2', ['G4','B4','D5']), 'C': ('C3', ['G4','C5','E5']), 'D': ('D3', ['F#4','A4','D5']), 'D7': ('D3', ['F#4','C5','D5']),
+          'Am': ('A2', ['A4','C5','E5']), 'Em': ('E3', ['G4','B4','E5'])}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(TY_A, TY_ACH), (None, ['G','Em','C','D','G','Em','Am','D7']), (TY_B, TY_BCH), (TY_A, TY_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'G'),(None,'D7')] + body[:nb - 4] + [(TY_A[6], 'D7'), ([('G5',8)], 'G')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in tri]; rf = freq(root, shift)
+        if not fin:
+            tr.add(soft_bass(rf, BEAT*1.8), t0, -.05, .55); tr.add(soft_bass(rf*1.5, BEAT*1.8), t0 + 2*BEAT, -.05, .45)
+            tr.add(string_pad([f/2 for f in fr], BAR*1.02), t0, -.3, .3)
+            for k in range(8): tr.add(clock_tick(k % 2 == 0), t0 + k*E, .45 if k % 2 == 0 else .55, .16 if k % 2 == 0 else .1)
+            if bi >= 2:
+                for b in (1, 3): tr.add(toy_tom(), t0 + b*BEAT, .2, .35)
+            if bi % 8 == 7: tr.add(bell_tree(bi), t0 + 3*BEAT, .5, .6)
+            if bi % 8 == 3 and bi >= 2: tr.add(spring_boing(), t0 + 3*BEAT + E, -.4, .35)
+        else:
+            tr.add(soft_bass(rf, 2.0), t0, 0, .6); tr.add(string_pad([f/2 for f in fr], 2.6), t0, -.3, .4); tr.add(bell_tree(99), t0 + .3, .5, .6)
+        if mel is None and not fin and bi >= 2:
+            for k, nn in enumerate([tri[0], tri[1], tri[2], tri[1], tri[0], tri[1], tri[2], tri[1]]): tr.add(kalimba_lead(freq(nn, shift), .5), t0 + k*E, .35, .22)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = max(.5, ln*E + .3) + (1.4 if fin else 0)
+                    tr.add(kalimba_lead(f, L), t0 + p*E, .1, .8)
+                    if ln >= 3: tr.add(kalimba_lead(f, L), t0 + p*E + E, .15, .3)   # little tine echo on long notes
+                p += ln
+    return tr.buf
+
+# ---------- "Whose Footprints?" (episode, The Big Four after the rain): bouncy 6/8 'puddle jig' in E-flat (written in D, shift +1),
+# ---------- dotted-quarter ~100 bpm – oboe lead, soft tuba on 1 + 4, pizzicato oom-pah-pah offbeats, woodblock 'footsteps', glockenspiel
+# ---------- doubling in the B part, a little mud 'plop' at the end of each phrase ----------
+FP_A = [[('A4',2),('F#4',1),('A4',2),('D5',1)], [('B4',2),('G4',1),('B4',2),('D5',1)], [('C#5',2),('E5',1),('A5',2),('G5',1)], [('F#5',4),('-',2)],
+        [('F#5',2),('D5',1),('B4',2),('D5',1)], [('E5',2),('G5',1),('B5',2),('G5',1)], [('F#5',2),('E5',1),('C#5',2),('E5',1)], [('D5',4),('-',2)]]
+FP_ACH = ['D','G','A','D','Bm','Em','A','D']
+FP_B = [[('D5',1),('E5',1),('F#5',1),('G5',3)], [('F#5',1),('E5',1),('D5',1),('F#5',3)], [('E5',1),('F#5',1),('G5',1),('B5',3)], [('A5',4),('-',2)],
+        [('B5',2),('A5',1),('G5',2),('F#5',1)], [('F#5',2),('E5',1),('D5',2),('F#5',1)], [('E5',2),('C#5',1),('A4',2),('C#5',1)], [('D5',4),('-',2)]]
+FP_BCH = ['G','D','Em','A','G','D','A','D']
+
+def mud_plop(pitch=1.0):
+    """Soft, round 'plop' – a low sine with a falling pitch and a tiny wet click."""
+    n = int(.22*SR); t = tt(n)
+    f = (320*pitch) * np.exp(-t/.06) + 90*pitch
+    s = np.sin(2*np.pi*np.cumsum(f)/SR) * np.exp(-t/.07)
+    s += band(rng.standard_normal(n), 1500, 4000) * .08 * np.exp(-t/.01)
+    return s * .7
+
+def footprints_long(dur, shift=0):
+    E = .2; BAR = 6*E
+    tr = Track(dur)
+    CH = {'D': ('D3', 'A2', ['F#4','A4','D5']), 'G': ('G2', 'D3', ['G4','B4','D5']), 'A': ('A2', 'E3', ['E4','G4','C#5']),
+          'Bm': ('B2', 'F#2', ['F#4','B4','D5']), 'Em': ('E3', 'B2', ['E4','G4','B4'])}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(FP_A, FP_ACH), (FP_B, FP_BCH), (None, ['D','Bm','G','A','D','Em','A','D']), (FP_A, FP_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += [(mm, cc, m is FP_B) for mm, cc in zip(m if m else [None]*8, c)]; i += 1
+    song = [(None,'D',False),(None,'A',False)] + body[:nb - 4] + [(FP_A[6], 'A', False), ([('D5',6)], 'D', False)]
+    last = len(song) - 1
+    for bi, (mel, ch, isB) in enumerate(song):
+        t0 = bi*BAR; root, fifth, tri = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in tri]
+        if not fin:
+            tr.add(tuba(freq(root, shift), .5), t0, -.05, .55); tr.add(tuba(freq(fifth, shift), .45), t0 + 3*E, -.05, .45)
+            for p in (1, 2, 4, 5):
+                for k, f in enumerate(fr): tr.add(pizz(f, .3), t0 + p*E + k*.006, -.3 + k*.15, .13)
+            if bi >= 2:
+                tr.add(woodblock(1.0), t0, .4, .16); tr.add(woodblock(.8), t0 + 3*E, .4, .14)
+                if bi % 8 == 7: tr.add(mud_plop(1.0), t0 + 4*E, .2, .35)
+        else:
+            tr.add(tuba(freq(root, shift), 1.4), t0, 0, .6)
+            for k, f in enumerate(fr): tr.add(pizz(f, .6), t0 + k*.03, -.3 + k*.15, .25)
+            tr.add(mud_plop(.9), t0 + 2*E, .2, .35)
+        if mel is None and not fin and bi >= 2:
+            for k, nn in enumerate([tri[0], tri[1], tri[2], tri[1]]): tr.add(glock(freq(nn, shift + 12), .5), t0 + k*1.5*E, .35, .12)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E*.92 + (1.4 if fin else 0)
+                    tr.add(oboe(f, L), t0 + p*E, .1, .5)
+                    if isB: tr.add(glock(f*2, .6), t0 + p*E, .3, .1)
+                p += ln
+    return tr.buf
