@@ -239,13 +239,15 @@ St.episode({
       sfx: [...[0, 1, 2, 3, 4, 5, 6].map(i => [i * .45 + .2, 'tiptoe', .22, -.3 + i * .08]), [3.2, 'snort', .2], [7.2, 'tick', .35], [8.2, 'tick', .35], [9.2, 'tick', .35],
             [8.6, 'rustle', .4], [10.2, 'pop', .4], [10.8, 'twinkle', .35], [15.4, 'peep', .3], [21.8, 'trumpet', .25], [22.2, 'cheer', .35], [25.2, 'tada', .35]] },
 
-    // 3 – sunset recap: five friends, five kinds of feet
-    { d: 27, draw: (u, c) => {
+    // 3 – sunset recap: five friends, five kinds of feet (d 30: Tilly's thank-you ends before the end card)
+    { d: 30, draw: (u, c) => {
         savanna(58 + u * .05, c.t);
         S.bush(BUSH[0], BUSH[1], BUSH[2]);
         friends(u, c, (k, i) => u > .6 && u < 3.2 ? hop(c.t + i, 4, 6) : 0);
         mud(c.t, .6);
-        tilly(520, 506, 1.2, c.t, { talk: c.talk('tilly') });
+        // after the recap Tilly walks over to Boris (keeps her clear of the subscribe pill at the very end)
+        const tw = ease(clamp((u - 18.6) / 3));
+        tilly(lerp(520, 872, tw), 506, 1.2, c.t, { talk: c.talk('tilly'), walk: tw > 0 && tw < 1, flip: tw > 0 && tw < 1 });
       },
       after: (u, c) => {
         const k = win(u, 3.6, 18.4, .5); if (k <= 0) return;
@@ -259,7 +261,7 @@ St.episode({
           C.bigText(nm, cx, 200, clamp((u - t0 - .4) / .3) * k, 40, col);
         });
       },
-      says: [sayL('lion', 'What a fun game!', .6, 3.4), sayL('rhino', 'Every foot is different!', 18.6, 21.6), ['tilly', 'Thank you, friends!', 21.8, 25.0, TIL_BUB[0], TIL_BUB[1], 28]],
+      says: [sayL('lion', 'What a fun game!', .6, 3.4), sayL('rhino', 'Every foot is different!', 18.6, 21.6), ['tilly', 'Thank you, friends!', 21.8, 24.8, 872, TIL_BUB[1], 28]],
       sfx: [[.6, 'roar', .22], [1.0, 'laugh', .3], ...[0, 1, 2, 3, 4].map(i => [4.4 + i * 2.4, `chime:${['C5', 'D5', 'E5', 'G5', 'C6'][i]}`, .45]),
             [4.6, 'roar', .15], [7.0, 'trumpet', .15], [9.4, 'bellow', .15], [11.8, 'snort', .15], [14.2, 'peep', .25], [16.8, 'tada', .4], [18.6, 'snort', .2], [21.8, 'peep', .3]] },
   ],

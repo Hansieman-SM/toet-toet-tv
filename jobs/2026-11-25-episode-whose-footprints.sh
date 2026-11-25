@@ -5,6 +5,7 @@
 # lead to a bush – Tilly the Turtle (new character) walks out: "Can I play with you?" – "Yes! Come and play!" (being kind, including others).
 # Sunset recap card: five friends, five kinds of feet. New music footprints_long: bouncy 6/8 puddle jig in E-flat (oboe, tuba, pizzicato,
 # woodblock footsteps, glockenspiel, mud plops).
+# rev2: recap shot 3 s longer so Tilly's "Thank you, friends!" bubble is gone before the end card + subscribe pill.
 set -e; S=2026-11-25-episode-whose-footprints; O=release/$S; mkdir -p $O
 python3 ep/mix.py ep/en16_footprints.js $O/audio.wav
 SUBSCRIBE=1 OW=2560 OH=1440 node ep/en16_footprints.js | ffmpeg -v error -y -f rawvideo -pix_fmt rgba -s 2560x1440 -r 30 -i - -i $O/audio.wav -c:v libx264 -preset slow -tune animation -crf 16 -pix_fmt yuv420p -c:a aac -b:a 192k -movflags +faststart -shortest $O/$S.mp4
