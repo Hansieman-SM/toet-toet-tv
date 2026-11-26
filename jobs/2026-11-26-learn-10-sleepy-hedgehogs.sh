@@ -1,4 +1,5 @@
 #!/bin/bash
+# rev2 (2026-11-26): Toet parked 20 px further right (BX 98) so his box no longer touches the left frame edge
 # Learning series #19 – Counting #7 (EN): 10 Sleepy Hedgehogs with Little Truck Toet (ep/learn19_hedgehogs.js: a warm golden late-autumn
 # afternoon at the forest edge; Toet parks by a big cosy leaf pile under an old tree next to a hedge; one by one ten little hedgehogs
 # (each its own accent: coloured leaf / little apple on the spikes, scarf, bow, different sizes) waddle out of the hedge, climb the pile,

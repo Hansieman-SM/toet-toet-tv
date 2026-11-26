@@ -1,4 +1,5 @@
 #!/bin/bash
+# rev2 (2026-11-26): Toet parked 20 px further right (BX 98) so his box no longer touches the left frame edge
 # Short: 10 Sleepy Hedgehogs – count the hedgehogs with Little Truck Toet: hedgehogs 1–6 waddle out of the hedge and snuggle into the
 # leaf pile for their winter sleep (tray of 10, numeral + number word, rising chime) (from ep/learn19_hedgehogs.js, 11.5–56.5 s,
 # full 16:9 frame – contains text + speech bubbles, so no crop)
