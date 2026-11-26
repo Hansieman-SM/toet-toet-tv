@@ -2237,3 +2237,77 @@ def footprints_long(dur, shift=0):
                     if isB: tr.add(glock(f*2, .6), t0 + p*E, .3, .1)
                 p += ln
     return tr.buf
+
+# ---------- "10 Sleepy Hedgehogs" (learning counting #7, Little Truck Toet by the leaf pile at the forest edge): slow cosy cradle waltz in
+# ---------- B-flat (written in C, shift -2), 3/4 ~88 bpm – warm bowed-cello lead (one octave below the written line), music-box tines
+# ---------- on beats 2 + 3 (comb-tine timbre, slight detune shimmer), soft round bass on 1, a hushed 'leaf brush' on each downbeat.
+# ---------- No drums; the middle sections leave out the cello (music box plays rocking arpeggios). Also adds a soft 'snore' sfx. ----------
+HH_A = [[('E5',4),('G5',2)], [('F5',2),('E5',2),('D5',2)], [('C5',4),('E5',2)], [('D5',6)],
+        [('E5',4),('A5',2)], [('G5',2),('F5',2),('E5',2)], [('D5',2),('E5',2),('F5',2)], [('C5',6)]]
+HH_ACH = ['C','G','Am','G','F','C','G','C']
+HH_B = [[('A5',4),('G5',2)], [('F5',2),('E5',2),('C5',2)], [('D5',4),('F5',2)], [('E5',6)],
+        [('F5',4),('E5',2)], [('D5',2),('C5',2),('A4',2)], [('B4',2),('C5',2),('D5',2)], [('C5',6)]]
+HH_BCH = ['F','C','Dm','Am','F','Am','G','C']
+
+def hh_cello(f, length):
+    """Warm bowed cello: rich 1/h harmonic series, low-passed body, slow bow attack, delayed gentle vibrato, a little bow hiss."""
+    from scipy.signal import lfilter, butter
+    n = int(length*SR); t = tt(n)
+    vib = 1 + .006*np.sin(2*np.pi*5.0*t) * np.clip((t - .3)/.4, 0, 1)
+    ph = 2*np.pi*np.cumsum(f*vib)/SR
+    s = sum(np.sin(h*ph) / h**1.1 for h in range(1, 9))
+    s = lfilter(*butter(2, min(f*6, 2400)/(SR/2)), s)
+    bow = band(rng.standard_normal(n), 800, 4000) * .03 * (np.exp(-t/.15) + .25)
+    env = np.minimum(t/.14, 1)**1.3 * (1 - .12*np.minimum(t/1.2, 1)) * np.clip((length - t)/.22, 0, 1)
+    return (s*.32 + bow) * env
+
+def hh_musicbox(f, length=1.4):
+    """Music-box comb tine: bright fundamental with a detuned twin (shimmer), quick metallic 'tink' partial, long soft decay."""
+    n = int(length*SR); t = tt(n)
+    s = np.sin(2*np.pi*f*t) + .6*np.sin(2*np.pi*f*1.003*t) + .25*np.sin(2*np.pi*f*2*t)*np.exp(-t/.25) + .35*np.sin(2*np.pi*f*5.95*t)*np.exp(-t/.02)
+    return s * np.minimum(t/.0015, 1) * np.exp(-t/.7) * np.clip((length - t)/.1, 0, 1) * .25
+
+def hh_leafbrush():
+    n = int(.5*SR); t = tt(n)
+    return band(rng.standard_normal(n), 500, 3500) * np.minimum(t/.04, 1) * np.exp(-t/.12) * .35
+
+def snore(pitch=1.0):
+    """Tiny, cute hedgehog snore: a soft fluttery in-breath, then a little whistling out-breath."""
+    n1 = int(1.0*SR); t1 = tt(n1)
+    inb = band(rng.standard_normal(n1), 180*pitch, 900*pitch) * (.6 + .4*np.sin(2*np.pi*28*t1)) * np.sin(np.pi*t1/1.0)**2
+    n2 = int(.8*SR); t2 = tt(n2)
+    f = 900*pitch * (1 - .25*t2/.8)
+    outb = (np.sin(2*np.pi*np.cumsum(f)/SR)*.25 + band(rng.standard_normal(n2), 1500, 5000)*.4) * np.sin(np.pi*t2/.8)**2 * .5
+    return np.concatenate([inb*.8, np.zeros(int(.12*SR)), outb]) * .6
+NAMED.update({'snore': snore})
+
+def hedgehogs_long(dur, shift=-2):
+    BEAT = .68; BAR = 3*BEAT; E = BEAT/2
+    tr = Track(dur)
+    CH = {'C': ('C3', ['C4','E4','G4']), 'G': ('G2', ['B3','D4','G4']), 'Am': ('A2', ['A3','C4','E4']), 'F': ('F2', ['A3','C4','F4']), 'Dm': ('D3', ['D4','F4','A4'])}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(HH_A, HH_ACH), (None, ['C','Am','F','G','C','Am','Dm','G']), (HH_B, HH_BCH), (HH_A, HH_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'C'),(None,'G')] + body[:nb - 4] + [(HH_A[6], 'G'), ([('C5',6)], 'C')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in tri]; rf = freq(root, shift)
+        if not fin:
+            tr.add(soft_bass(rf, 1.6), t0, -.05, .55)
+            tr.add(hh_musicbox(fr[1]*4, 1.3), t0 + BEAT, .3, .22); tr.add(hh_musicbox(fr[2]*4, 1.3), t0 + 2*BEAT, -.3, .2)
+            if bi >= 2: tr.add(hh_leafbrush(), t0, .45, .18)
+            if mel is None and bi >= 2:
+                for k, idx in enumerate([0, 1, 2, 1, 2, 0]):
+                    tr.add(hh_musicbox(fr[idx]*(4 if k < 3 else 2)*(2 if k == 4 else 1), 1.2), t0 + k*E + E*.5, .35 if k % 2 else -.35, .16)
+        else:
+            tr.add(soft_bass(rf, 3.0), t0, 0, .6)
+            for k, f in enumerate(fr): tr.add(hh_musicbox(f*4, 2.6), t0 + k*.12, -.3 + k*.3, .22)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift) / 2; L = ln*E*.98 + (1.8 if fin else .08)
+                    tr.add(hh_cello(f, L), t0 + p*E, .05, .7)
+                p += ln
+    return tr.buf

@@ -116,7 +116,7 @@
 | 2026-11-25 | Toy ABC – A, B, C with The Big Four! (A Airplane … I Ice cream cart, letter blocks + word cards) | ep/learn18_toy_abc.js 9.0–54.0 s | YT 2026-11-26 17:00 · Instagram 17:15 · TikTok 17:30 (custom cover on all three) |
 
 ## Theme ideas not used yet
-rain forest at dusk, night farm, savanna sunset (Big Four sleeping), rainy window & cozy room, koi pond, butterflies & flower garden, bedtime train journey with Toet (night countryside).
+rain forest at dusk, night farm, savanna sunset (Big Four sleeping), rainy window & cozy room, butterflies & flower garden, bedtime train journey with Toet (night countryside).
 
 ## TikTok (@toet.friends)
 - 2026-10-28 12:30 Shape Hunt · 17:30 Sleepy Elephant · 19:30 Under the Sea
