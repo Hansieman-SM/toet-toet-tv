@@ -2311,3 +2311,124 @@ def hedgehogs_long(dur, shift=-2):
                     tr.add(hh_cello(f, L), t0 + p*E, .05, .7)
                 p += ln
     return tr.buf
+
+# ---------- "Sami the Snowplow" (episode en17, Toet's Helper Friends): bright snowy polka in G, ~116 bpm (2/4 felt in 4) –
+# ---------- warm cornet lead (new), oom-pah tuba + offbeat reed chords, sleigh bells on the eighths, glockenspiel sparkles every 4 bars ----------
+SP_A = [[('D5',2),('G5',2),('B5',3),('A5',1)], [('G5',2),('D5',2),('B4',4)], [('C5',2),('E5',2),('A5',3),('G5',1)], [('F#5',6),('-',2)],
+        [('D5',2),('G5',2),('B5',2),('D6',2)], [('C6',3),('B5',1),('A5',2),('E5',2)], [('D5',2),('F#5',2),('A5',2),('C6',2)], [('B5',6),('-',2)]]
+SP_ACH = ['G','G','C','D','G','C','D','G']
+SP_B = [[('E5',2),('G5',2),('C6',3),('B5',1)], [('A5',2),('G5',2),('E5',4)], [('D5',2),('F#5',2),('A5',3),('G5',1)], [('F#5',2),('E5',2),('D5',4)],
+        [('B4',2),('D5',2),('G5',2),('B5',2)], [('A5',3),('G5',1),('E5',2),('C6',2)], [('B5',2),('A5',2),('F#5',2),('A5',2)], [('G5',6),('-',2)]]
+SP_BCH = ['C','Am','D','D','G','C','D','G']
+
+def cornet(f, length):
+    """Warm cornet: soft brassy onset (harmonics bloom), round tone, light vibrato in long notes."""
+    n = int(length*SR); t = tt(n)
+    vib = 1 + .0045*np.sin(2*np.pi*5.4*t)*np.clip((t - .22)/.3, 0, 1)
+    ph = 2*np.pi*f*np.cumsum(vib)/SR
+    bloom = np.clip(t/.07, 0, 1)
+    s = np.sin(ph) + .55*bloom*np.sin(2*ph) + .35*bloom*np.sin(3*ph) + .18*bloom**2*np.sin(4*ph) + .08*bloom**2*np.sin(5*ph)
+    env = np.minimum(t/.025, 1) * np.clip((length - t)/.08, 0, 1) * (1 - .2*np.minimum(t/1.2, 1))
+    return s * env * .22
+
+def whirr(length=2.6):
+    """Wheels spinning in the snow: wobbling motor whine + snowy hiss."""
+    n = int(length*SR); t = tt(n)
+    f = 180 + 60*np.sin(2*np.pi*3*t) + 40*np.minimum(t/.4, 1)
+    s = np.sin(2*np.pi*np.cumsum(f)/SR) * .35 + band(rng.standard_normal(n), 2500, 9000) * .25 * (.6 + .4*np.sin(2*np.pi*7*t))
+    return s * np.minimum(t/.1, 1) * np.clip((length - t)/.4, 0, 1) * .6
+
+def scrape(length=1.3):
+    """Plough blade pushing snow: soft crunchy hiss that swells."""
+    n = int(length*SR); t = tt(n)
+    s = band(rng.standard_normal(n), 400, 3500) * (np.sin(np.pi*t/length)**1.5)
+    crunch = (rng.random(n) < .0016) * rng.uniform(.5, 1, n); crunch = np.convolve(crunch, np.exp(-np.arange(200)/40), 'same')
+    return (s * .35 + crunch * .2) * .7
+
+def beep(f=1250):
+    n = int(.32*SR); t = tt(n)
+    return np.sign(np.sin(2*np.pi*f*t)) * .18 * np.minimum(t/.005, 1) * np.clip((.32 - t)/.02, 0, 1)
+NAMED.update({'whirr': whirr, 'scrape': scrape, 'beep': beep})
+
+def snowplow_long(dur, shift=0):
+    BEAT = .52; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'G': ('G2', ['B3','D4','G4']), 'C': ('C3', ['C4','E4','G4']), 'D': ('D3', ['C4','D4','F#4']), 'Am': ('A2', ['A3','C4','E4'])}
+    FIFTH = {'G': 'D2', 'C': 'G2', 'D': 'A2', 'Am': 'E2'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(SP_A, SP_ACH), (SP_B, SP_BCH), (None, ['G','Am','C','D','G','C','D','D']), (SP_A, SP_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'G'),(None,'D')] + body[:nb - 4] + [(SP_A[6], 'D'), ([('G5',8)], 'G')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in tri]
+        if not fin:
+            for b, nn in enumerate([root, FIFTH[ch], root, FIFTH[ch]]): tr.add(tuba(freq(nn, shift), .4), t0 + b*BEAT, -.05, .5)
+            for b in range(4): tr.add(reed(fr, .22), t0 + b*BEAT + E, -.25, .22)
+            if bi >= 2:
+                for k in range(8): tr.add(sleigh(k), t0 + k*E, .4 if k % 2 else .3, .22 if k % 2 else .12)
+            if bi % 4 == 3:
+                for k, f in enumerate(fr[::-1] + [fr[0]*2]): tr.add(glock(f*4, .8), t0 + 2*BEAT + k*E*.5, .35, .12)
+        else:
+            tr.add(tuba(freq(root, shift), 1.4), t0, 0, .55); tr.add(reed(fr, 1.6), t0, -.25, .35)
+            for k, f in enumerate(fr): tr.add(glock(f*4, 1.4), t0 + k*.1, .35, .14)
+        if mel is None and not fin and bi >= 2:
+            for k, idx in enumerate([0, 2, 1, 2]): tr.add(xylo(fr[idx]*2, .4), t0 + k*BEAT, .3, .25)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E*.92 + (1.4 if fin else 0)
+                    tr.add(cornet(f, L), t0 + p*E, .08, .75)
+                p += ln
+    return tr.buf
+
+# ---------- "Can You Find It? Which One Is Different?" (learning #20, The Big Four, golden afternoon): lilting 6/8 in A major, ~ 64 dotted bpm –
+# ---------- bansuri-style bamboo flute lead (new: breathy, little scoop into each note), harp broken chords, soft round bass, shaker on the 8ths ----------
+DF_A = [[('E5',3),('C#5',1),('E5',2)], [('A5',4),('F#5',2)], [('E5',2),('D5',1),('C#5',2),('B4',1)], [('C#5',6)],
+        [('F#5',3),('E5',1),('D5',2)], [('B4',2),('C#5',1),('D5',3)], [('E5',2),('F#5',1),('G#5',2),('B5',1)], [('A5',6)]]
+DF_ACH = ['A','D','A','A','D','Bm','E','A']
+DF_B = [[('C#6',3),('B5',1),('A5',2)], [('F#5',4),('A5',2)], [('B5',2),('A5',1),('F#5',2),('E5',1)], [('E5',6)],
+        [('D5',2),('F#5',1),('A5',2),('F#5',1)], [('E5',2),('C#5',1),('A4',3)], [('B4',2),('C#5',1),('D5',2),('G#5',1)], [('A5',6)]]
+DF_BCH = ['F#m','D','Bm','E','D','A','E','A']
+
+def bansuri(f, length):
+    n = int(length*SR); t = tt(n)
+    scoop = 1 - .03*np.exp(-t/.05)                       # little scoop up into the note
+    vib = 1 + .006*np.sin(2*np.pi*5.0*t)*np.clip((t - .3)/.4, 0, 1)
+    ph = 2*np.pi*f*np.cumsum(scoop*vib)/SR
+    s = np.sin(ph) + .18*np.sin(2*ph) + .06*np.sin(3*ph)
+    breath = band(rng.standard_normal(n), f*.9, f*4) * (.16*np.exp(-t/.09) + .05)
+    env = np.minimum(t/.07, 1) * np.clip((length - t)/.15, 0, 1)
+    return (s * .5 + breath) * env * .7
+
+def different_long(dur, shift=0):
+    E = .31; BAR = 6*E
+    tr = Track(dur)
+    CH = {'A': ('A2', ['A3','C#4','E4']), 'D': ('D3', ['A3','D4','F#4']), 'Bm': ('B2', ['B3','D4','F#4']), 'E': ('E2', ['B3','E4','G#4']), 'F#m': ('F#2', ['A3','C#4','F#4'])}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(DF_A, DF_ACH), (None, ['A','F#m','D','E','A','F#m','Bm','E']), (DF_B, DF_BCH), (DF_A, DF_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'A'),(None,'E')] + body[:nb - 4] + [(DF_A[6], 'E'), ([('A5',6)], 'A')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in tri]; rf = freq(root, shift)
+        if not fin:
+            tr.add(soft_bass(rf, 1.0), t0, -.05, .55); tr.add(soft_bass(rf*1.5, .8), t0 + 3*E, -.05, .35)
+            for k, idx in enumerate([0, 1, 2, 1, 2, 1]): tr.add(harp([fr[idx]*(2 if k in (2, 4) else 1)], .9), t0 + k*E, -.3 if k % 2 else -.15, .2)
+            if bi >= 2:
+                for k in range(6): tr.add(shaker(), t0 + k*E, .4, .14 if k % 3 else .22)
+        else:
+            tr.add(soft_bass(rf, 2.6), t0, 0, .6); tr.add(harp(fr + [fr[0]*2], 2.4), t0, -.2, .35)
+        if mel is None and not fin and bi >= 2:
+            for k, f in enumerate([fr[2]*2, fr[1]*2]): tr.add(glock(f*2, .7), t0 + (k*3 + 1)*E, .35, .1)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E*.95 + (1.6 if fin else .05)
+                    tr.add(bansuri(f, L), t0 + p*E, .1, .8)
+                p += ln
+    return tr.buf

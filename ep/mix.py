@@ -41,6 +41,8 @@ elif kind == 'kites': music = kites_long(dur, m.get('shift', 0))
 elif kind == 'toyabc': music = toyabc_long(dur, m.get('shift', 0))
 elif kind == 'footprints': music = footprints_long(dur, m.get('shift', 0))
 elif kind == 'hedgehogs': music = hedgehogs_long(dur, m.get('shift', -2))
+elif kind == 'snowplow': music = snowplow_long(dur, m.get('shift', 0))
+elif kind == 'different': music = different_long(dur, m.get('shift', 0))
 else: music = lullaby(dur)
 events = [(t, make(name), g, pan) for t, name, g, pan in info['events']]
 duck = [tuple(d) for d in info['duck']]
