@@ -280,16 +280,19 @@ St.episode({
             [.6, 'snort', .2], [14.4, 'roar', .25], [14.6, 'tada', .4], [15.0, 'cheer', .35], [17.2, 'trumpet', .2]] },
 
     // 7 – Tilly's flower meadow: recap (five stones, scared → brave), "Friends help friends!"
-    { d: 30, draw: (u, c) => {
+    { d: 33, draw: (u, c) => {
         savanna(40 + u * .4, c.t);
         flowers(0, W, 440, 540, c.t, 70, 11); butterflies(c.t, 4, 60, 900);
         const POS = { elephant: [120, .62, true], lion: [330, .6, true], rhino: [650, .58, false], buffalo: [846, .6, false] };
-        ['elephant', 'lion', 'rhino', 'buffalo'].forEach((k, i) => { const [px, sc, fl] = POS[k];
-          actor(k, px, c, { sc, flip: fl, blink: i * .8, phase: i, lift: u > .4 && u < 2.6 ? hopH(c.t + i, 4, 6) : (k === 'lion' && u > 9.0 && u < 10.8 ? hopH(c.t, 6, 10) : 0) }); });
-        tilly(490, 486, 1.05, c.t, { talk: c.talk('tilly') });
+        // after "Friends help friends!" everybody walks off to play in the meadow (clear of the subscribe pill at the very end)
+        const ex = ease(clamp((u - 23.2) / 3.0)), exm = u > 23.2 && ex < 1;
+        ['elephant', 'lion', 'rhino', 'buffalo'].forEach((k, i) => { const [px0, sc, fl0] = POS[k], left = k === 'elephant' || k === 'lion';
+          const px = lerp(px0, left ? px0 - 520 : px0 + 520, ex), fl = u > 23.2 ? !left : fl0;
+          actor(k, px, c, { sc, flip: fl, moving: exm, blink: i * .8, phase: i, lift: u > .4 && u < 2.6 ? hopH(c.t + i, 4, 6) : (k === 'lion' && u > 9.0 && u < 10.8 ? hopH(c.t, 6, 10) : 0) }); });
+        tilly(lerp(490, 1060, ex), 486, 1.05, c.t, { talk: c.talk('tilly'), walk: exm, flip: u > 23.2 });
       },
       after: (u, c) => {
-        const k = win(u, 10.6, 24.0, .5); if (k <= 0) return;
+        const k = win(u, 10.6, 22.6, .5); if (k <= 0) return;
         x.save(); x.globalAlpha = k; x.fillStyle = 'rgba(246,251,255,.96)'; x.strokeStyle = INK; x.lineWidth = 4; rr(130, 30, 700, 226, 34); x.fill(); x.stroke(); x.restore();
         // five stones with numbers
         for (let i = 0; i < 5; i++) { const t0 = 11.2 + i * .9, kk = clamp((u - t0) / .3) * k, cx = 210 + i * 72;
@@ -304,8 +307,8 @@ St.episode({
         if (u > 19.2 && u < 21) C.sparkles(610, 196, c.t, 10, 70);
       },
       says: [['tilly', 'Welcome to my flowers!', .6, 3.4, 490, 352, 28], ['lion', 'I was scared...', 3.8, 6.4, 330, 300, 28], ['lion', 'But my friends helped me!', 6.6, 9.4, 360, 300, 28],
-             ['elephant', 'Friends help friends!', 24.4, 27.4, 200, 300, 28]],
+             ['elephant', 'Friends help friends!', 20.4, 23.0, 200, 300, 28]],
       sfx: [[.6, 'peep', .3], [1.0, 'laugh', .3], [3.8, 'roar', .15], [9.0, 'cheer', .3], ...[0, 1, 2, 3, 4].map(i => [11.2 + i * .9, `chime:${['F5', 'G5', 'A5', 'A#5', 'C6'][i]}`, .45]),
-            [16.0, 'tada', .3], [17.2, 'sad', .15], [19.2, 'tada', .4], [24.4, 'trumpet', .22], [24.8, 'cheer', .3]] },
+            [16.0, 'tada', .3], [17.2, 'sad', .15], [19.2, 'tada', .4], [20.4, 'trumpet', .22], [20.8, 'cheer', .3], [23.4, 'laugh', .25]] },
   ],
 });

@@ -1,4 +1,5 @@
 #!/bin/bash
+# rev2 (QC): at the end the friends walk off into the meadow before the subscribe pill appears (no overlap with characters)
 # Episode (EN): The Big Four – Stepping Stones (ep/en18_stones.js). Tilly the Turtle calls from across a little river; the friends count
 # the five stepping stones 1–5; Nico hops across, Boris clip-clops after him, big Ella wades through the water (splash!). Leo stays behind:
 # "I'm scared…" – Ella comes back and stands in the water next to the stones ("Let's go together!"), Nico cheers, Leo hops across slowly

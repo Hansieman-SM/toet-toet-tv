@@ -1,4 +1,5 @@
 #!/bin/bash
+# rev2 (QC): evening shot 3 s longer – Toet rolls away before the subscribe pill appears
 # Learning series #21 (THEMES #11) – Counting: 10 Christmas Baubles with Little Truck Toet (ep/learn21_baubles.js: snowy village green,
 # ten smiling baubles hop out of Toet's cargo box onto a Christmas tree one by one – tray of 10, numeral + number word, rising chime;
 # TEN!, recap 1–10, blue evening: fairy lights switch on, the star lights up, "Merry Christmas!"; new music baubles_long: handbell lead,

@@ -200,19 +200,19 @@ St.episode({
       sfx: Array.from({ length: 10 }, (_, i) => [2 + i * 1.25, `chime:${NOTES[i]}`, .55]).concat([[14.6, 'cheer', .35]]) },
 
     // 5 – blue evening: fairy lights switch on, the star lights up, Merry Christmas! Toet quietly rolls away.
-    { d: 17, draw: (u, c) => {
-        const p = lerp(.12, .6, ease(clamp((u - .3) / 6)));
-        const lights = clamp((u - 4.0) / 2.6), star = clamp((u - 7.0) / .8);
+    { d: 20, draw: (u, c) => {
+        const p = lerp(.12, .6, ease(clamp((u - .3) / 5)));
+        const lights = clamp((u - 3.0) / 2.6), star = clamp((u - 5.8) / .8);
         scene(c.t, { skyP: p, lights, star });
         const night = T.sky(p).night;
         hung(10, c.t, -1, 0, night);
-        const dk = ease(clamp((u - 10.6) / 2.8));   // rolls away before the subscribe pill appears
-        truck(c.t, { bx: lerp(BX, 1180, dk), moving: u > 10.6 && dk < 1, dist: dk * 1100, mouth: c.talk('toet'), night });
+        const dk = ease(clamp((u - 10.8) / 2.4));   // rolls away before the subscribe pill appears (pill from u = 13.5)
+        truck(c.t, { bx: lerp(BX, 1180, dk), moving: u > 10.8 && dk < 1, dist: dk * 1100, mouth: c.talk('toet'), night });
         snowfall(c.t, 50, .9);
-        if (u > 7 && u < 8.6) C.sparkles(TX, TTOP - 6, c.t, 12, 60);
+        if (u > 5.8 && u < 7.4) C.sparkles(TX, TTOP - 6, c.t, 12, 60);
       },
-      says: [['toet', 'Our tree is ready!', 7.6, 10.2, 292, 228, 28], ['toet', 'Merry Christmas!', 10.4, 13.0, 380, 228, 28]],
-      sfx: Array.from({ length: 6 }, (_, k) => [4.0 + k * .45, `twinkle:${['G5', 'B5', 'D6', 'G6', 'B5', 'D6'][k]}`, .22, -.3 + k * .12])
-        .concat([[7.0, 'tada', .35], [7.1, 'sleigh', .3, .2], [10.6, 'honk', .25]]) },
+      says: [['toet', 'Our tree is ready!', 6.4, 8.6, 292, 228, 28], ['toet', 'Merry Christmas!', 8.8, 10.7, 292, 228, 28]],
+      sfx: Array.from({ length: 6 }, (_, k) => [3.0 + k * .45, `twinkle:${['G5', 'B5', 'D6', 'G6', 'B5', 'D6'][k]}`, .22, -.3 + k * .12])
+        .concat([[5.8, 'tada', .35], [5.9, 'sleigh', .3, .2], [10.8, 'honk', .25]]) },
   ],
 });

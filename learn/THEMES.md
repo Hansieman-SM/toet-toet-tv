@@ -15,7 +15,7 @@ Mark a theme as used with date + job name. Seasonal: autumn until ±Nov 30, wint
 | 8 | Counting | 10 Twinkling Stars at Bedtime | The Big Four | 2026-11-15 learn-10-twinkling-stars (YT 2026-11-16 14:00) |
 | 9 | Can You Find It? | Shapes: circle, square, triangle, star hidden in the savanna | The Big Four | 2026-11-16 learn-can-you-find-it-shapes (YT 2026-11-17 14:00) |
 | 10 | ABC | Vehicle ABC (A Ambulance, B Bus, C Crane, D Digger…) – ties in with "Helper Friends" | Little Truck Toet | 2026-11-19 learn-vehicle-abc (YT 2026-11-20 14:00) |
-| 11 | Counting | 10 Christmas Baubles on the tree (December) | Little Truck Toet | |
+| 11 | Counting | 10 Christmas Baubles on the tree (December) | Little Truck Toet | 2026-11-28 learn-10-christmas-baubles (YT 2026-11-29 14:00, first Advent Sunday) |
 | 12 | Counting | 10 Presents from Santa (own Santa design, December) | The Big Four | |
 | 13 | ABC | Winter ABC (I Igloo, M Mitten, S Snowman, P Penguin…) | Little Truck Toet | 2026-11-23 learn-winter-abc (YT 2026-11-24 14:00; cosy winter, no Christmas; P = Pinecone, penguin not used) |
 | 14 | Color Mixing (approved 2026-11-12) | Toet's Color Mixing: two paint pots pour together → red + yellow = orange, blue + yellow = green, red + blue = purple; 3-dot "what will it be?" pause before each reveal, recap | Little Truck Toet | 2026-11-20 learn-toets-color-mixing (YT 2026-11-21 14:00) |
