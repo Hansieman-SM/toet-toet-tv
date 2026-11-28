@@ -2432,3 +2432,111 @@ def different_long(dur, shift=0):
                     tr.add(bansuri(f, L), t0 + p*E, .1, .8)
                 p += ln
     return tr.buf
+
+# ---------- "10 Christmas Baubles" (learning #21, Little Truck Toet, snowy village green): gentle Christmas-card waltz in G, 3/4 ~ 92 bpm –
+# ---------- handbell lead (new: inharmonic bell partials, soft strike, long ring), warm string pad, pizzicato bass, soft triangle on bar 1 ----------
+BB_A = [[('D5',2),('G5',2),('B5',2)], [('A5',4),('G5',2)], [('E5',2),('G5',2),('C6',2)], [('B5',6)],
+        [('A5',2),('B5',2),('C6',2)], [('D6',3),('C6',1),('B5',2)], [('A5',2),('F#5',2),('D5',2)], [('G5',6)]]
+BB_ACH = ['G','D','C','G','Am','G','D','G']
+BB_B = [[('B5',3),('A5',1),('G5',2)], [('E5',4),('G5',2)], [('C6',3),('B5',1),('A5',2)], [('F#5',6)],
+        [('G5',2),('A5',2),('B5',2)], [('C6',2),('E6',2),('D6',2)], [('B5',2),('A5',2),('F#5',2)], [('G5',6)]]
+BB_BCH = ['Em','C','Am','D','G','C','D','G']
+
+def handbell(f, length):
+    """Handbell: soft leather-clapper strike, partials at 1, 2.0, 3.0 and a slightly sharp 4.2, the upper ones fading first; long gentle ring."""
+    n = int(length*SR); t = tt(n)
+    s = (np.sin(2*np.pi*f*t) + .5*np.sin(2*np.pi*f*2.0*t)*np.exp(-t/.9) + .28*np.sin(2*np.pi*f*3.01*t)*np.exp(-t/.45)
+         + .14*np.sin(2*np.pi*f*4.2*t)*np.exp(-t/.2) + .05*np.sin(2*np.pi*f*5.4*t)*np.exp(-t/.06))
+    trem = 1 + .05*np.sin(2*np.pi*3.2*t)                  # the bell gently swinging
+    env = np.minimum(t/.004, 1) * np.exp(-t/1.6) * np.clip((length - t)/.25, 0, 1)
+    return s * trem * env * .26
+
+def baubles_long(dur, shift=0):
+    BEAT = .65; BAR = 3*BEAT; E = BEAT/2
+    tr = Track(dur)
+    CH = {'G': ('G2', ['B3','D4','G4']), 'D': ('D3', ['A3','D4','F#4']), 'C': ('C3', ['C4','E4','G4']), 'Am': ('A2', ['A3','C4','E4']), 'Em': ('E2', ['B3','E4','G4'])}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(BB_A, BB_ACH), (None, ['G','Em','C','D','G','Em','Am','D']), (BB_B, BB_BCH), (BB_A, BB_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'G'),(None,'D')] + body[:nb - 4] + [(BB_A[6], 'D'), ([('G5',6)], 'G')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in tri]; rf = freq(root, shift)
+        if not fin:
+            tr.add(pizz(rf, .6), t0, -.1, .7)
+            for b in (1, 2): tr.add(pizz(fr[0], .35), t0 + b*BEAT, -.2, .3); tr.add(pizz(fr[2], .35), t0 + b*BEAT, .1, .22)
+            if bi % 2 == 0: tr.add(string_pad(fr, 2*BAR), t0, 0, .09)
+            if bi % 4 == 0 and bi >= 2: tr.add(triangle_ping(), t0, .45, .18)
+            if mel is None and bi >= 2:
+                for k, idx in enumerate([0, 1, 2, 1, 2, 1]): tr.add(handbell(fr[idx]*2, 1.2), t0 + k*E, .3 if k % 2 else -.25, .3)
+        else:
+            tr.add(pizz(rf, 1.2), t0, 0, .7); tr.add(string_pad(fr, 3.0), t0, 0, .12)
+            for k, f in enumerate(fr): tr.add(handbell(f*2, 3.0), t0 + k*.14, -.3 + k*.3, .4)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E + (2.4 if fin else 1.0)
+                    tr.add(handbell(f, L), t0 + p*E, .08, .85)
+                p += ln
+    return tr.buf
+
+# ---------- "Stepping Stones" (episode en18, The Big Four): bouncy 'hop-hop' march in F, 2/4 felt in 4, ~ 112 bpm –
+# ---------- marimba lead (new: wooden bar with tube resonance, two-mallet roll on long notes), pizzicato strings, soft tuba, woodblock hops ----------
+ST_A = [[('C5',2),('F5',2),('A5',2),('F5',2)], [('G5',3),('A5',1),('G5',4)], [('E5',2),('G5',2),('C6',2),('A5',2)], [('F5',6),('-',2)],
+        [('A5',2),('A5',2),('A#5',2),('C6',2)], [('D6',3),('C6',1),('A#5',4)], [('A5',2),('G5',2),('E5',2),('G5',2)], [('F5',6),('-',2)]]
+ST_ACH = ['F','C','C','F','F','A#','C','F']
+ST_B = [[('D5',2),('F5',2),('A5',4)], [('A#5',2),('A5',2),('G5',4)], [('C5',2),('E5',2),('G5',4)], [('A5',2),('G5',2),('F5',4)],
+        [('F5',2),('G5',2),('A5',2),('A#5',2)], [('C6',4),('A5',4)], [('G5',2),('A5',2),('A#5',2),('E5',2)], [('F5',6),('-',2)]]
+ST_BCH = ['Dm','A#','C','F','F','F','C','F']
+
+def marimba(f, length):
+    """Marimba bar: warm fundamental + tuned 4th partial (struck), tube resonance swell, soft rubber-mallet thud; long notes get a gentle roll."""
+    n = int(length*SR); t = tt(n)
+    def strike(tt0):
+        e = np.exp(-tt0/.38) * np.minimum(tt0/.002, 1)
+        return (np.sin(2*np.pi*f*tt0) + .22*np.sin(2*np.pi*f*4*tt0)*np.exp(-tt0/.05) + .1*np.sin(2*np.pi*f*10*tt0)*np.exp(-tt0/.01)) * e
+    s = strike(t)
+    if length > .5:                                       # roll: soft repeated strikes
+        for k in range(1, int(length/.11)):
+            st = int(k*.11*SR); tt0 = tt(n - st)
+            s[st:] += strike(tt0) * .45 * (1 - .4*(k*.11/length))
+    return s * np.clip((length - t)/.06, 0, 1) * .3
+
+def stones_long(dur, shift=0):
+    BEAT = .54; E = BEAT/2; BAR = 4*BEAT
+    tr = Track(dur)
+    CH = {'F': ('F2', ['A3','C4','F4']), 'C': ('C3', ['G3','C4','E4']), 'A#': ('A#2', ['A#3','D4','F4']), 'Dm': ('D3', ['A3','D4','F4'])}
+    FIFTH = {'F': 'C3', 'C': 'G2', 'A#': 'F2', 'Dm': 'A2'}
+    nb = int(dur // BAR); body = []; i = 0
+    cyc = [(ST_A, ST_ACH), (None, ['F','Dm','A#','C','F','Dm','A#','C']), (ST_B, ST_BCH), (ST_A, ST_ACH)]
+    while len(body) < nb - 4:
+        m, c = cyc[i % 4]; body += list(zip(m if m else [None]*8, c)); i += 1
+    song = [(None,'F'),(None,'C')] + body[:nb - 4] + [(ST_A[6], 'C'), ([('F5',8)], 'F')]
+    last = len(song) - 1
+    for bi, (mel, ch) in enumerate(song):
+        t0 = bi*BAR; root, tri = CH[ch]; fin = bi == last; fr = [freq(nn, shift) for nn in tri]
+        if not fin:
+            for b, nn in enumerate([root, FIFTH[ch], root, FIFTH[ch]]): tr.add(tuba(freq(nn, shift), .36), t0 + b*BEAT, -.05, .42)
+            for b in range(4):
+                tr.add(pizz(fr[1]*2, .3), t0 + b*BEAT + E, -.3, .22); tr.add(pizz(fr[2]*2, .3), t0 + b*BEAT + E, .2, .18)
+            if bi >= 2:
+                tr.add(woodblock(), t0 + BEAT, .4, .2); tr.add(woodblock(), t0 + 3*BEAT, .4, .2)
+                if bi % 2: tr.add(woodblock(), t0 + 3*BEAT + E, .45, .14)
+        else:
+            tr.add(tuba(freq(root, shift), 1.4), t0, 0, .5)
+            for k, f in enumerate(fr): tr.add(pizz(f*2, 1.0), t0 + k*.08, -.2 + k*.2, .3)
+        if mel is None and not fin and bi >= 2:
+            for k, idx in enumerate([0, 1, 2, 1, 0, 1, 2, 1]): tr.add(marimba(fr[idx]*2, .3), t0 + k*E, .3 if k % 2 else -.1, .32)
+        if mel:
+            p = 0
+            for note, ln in mel:
+                if note != '-':
+                    f = freq(note, shift); L = ln*E*.95 + (1.2 if fin else 0)
+                    tr.add(marimba(f, L), t0 + p*E, .08, .9)
+                p += ln
+    return tr.buf
+def jingle(v=0):
+    return sleigh(int(v)) * 1.0
+NAMED.update({'sleigh': jingle})
